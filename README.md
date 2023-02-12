@@ -16,7 +16,7 @@ This sensor is the sensor of dfrobot not adafruit so it's not work at the moment
     + The CO2 data may stuck at 5000 ppm, in order to fix that you can calibrate the sensor with the functions given in the library and source code. Some explaining was made about that in source file.
 
 - Calibration
-    + You can calibrate MH-Z19 with the given instructions in the source file or you may use the inside "MH-Z19C Calibration" file. Even though this file were given, you may download it from https://github.com/WifWaf/MH-Z19. 
+    + You can calibrate MH-Z19 with the given instructions in the source file or you may use the inside "MH-Z19C Calibration" file. Even though this file were given, you may download it from https://github.com/WifWaf/MH-Z19 (CAREFUL, this sketch used another library for MHZ19)
 
     +    HOW TO CALIBRATE:
         + Hardware Method  
