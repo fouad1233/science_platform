@@ -17,7 +17,7 @@ float float_value;
 bool bool_value = true;
  
 // MAC Address of responder - edit as required
-uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x2D, 0xCC};
+uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x25, 0x1C};
  
 // Define a data structure
 typedef struct struct_message {
