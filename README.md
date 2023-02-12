@@ -4,7 +4,7 @@ This sensor is the sensor of dfrobot not adafruit so it's not work at the moment
 
 ## esp now
 - esp32 initiator(transmitter) mac adress is as following -> 40:91:51:AC:28:38
-- esp32 responder (receiver) mac adress is as following -> 40:91:51:AC:2D:CC
+- esp32 responder (receiver) mac adress is as following -> 40:91:51:AC:25:1C
  
 ## mh-z19c
 - Requirements: 
