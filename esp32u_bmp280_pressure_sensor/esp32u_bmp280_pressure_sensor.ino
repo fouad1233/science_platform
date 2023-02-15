@@ -24,11 +24,21 @@ BMP   bmp(&Wire, BMP::eSdoLow);
 void printLastOperateStatus(BMP::eStatus_t eStatus)
 {
   switch(eStatus) {
-  case BMP::eStatusOK:    Serial.println("everything ok"); break;
-  case BMP::eStatusErr:   Serial.println("unknow error"); break;
-  case BMP::eStatusErrDeviceNotDetected:    Serial.println("device not detected"); break;
-  case BMP::eStatusErrParameter:    Serial.println("parameter error"); break;
-  default: Serial.println("unknow status"); break;
+    case BMP::eStatusOK:
+      Serial.println("everything ok");
+      break;
+    case BMP::eStatusErr:   
+      Serial.println("unknow error");
+      break;
+    case BMP::eStatusErrDeviceNotDetected:
+      Serial.println("device not detected");
+      break;
+    case BMP::eStatusErrParameter:
+      Serial.println("parameter error");
+      break;
+    default: 
+      Serial.println("unknow status");
+      break;
   }
 }
 
