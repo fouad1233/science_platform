@@ -79,7 +79,8 @@ void sendSensor() // function to read sensor values and print with Serial librar
 
 }
 
-void setup()
+
+void SI1145_setup()
 {
   Serial.begin(115200);
   Serial.println("Beginning Si1145!");
@@ -89,9 +90,11 @@ void setup()
     delay(1000);
   }
   Serial.println("Si1145 is ready!");
-  delay(1000);
+}
 
-/////////
+
+void BMP280_setup()
+{
   bmp.reset();
   Serial.println("bmp config test");
   while(bmp.begin() != BMP::eStatusOK) {
@@ -106,8 +109,39 @@ void setup()
   bmp.setCtrlMeasSamplingTemp(BMP::eSampling_X8);     // set temperature over sampling
   bmp.setCtrlMeasSamplingPress(BMP::eSampling_X8);    // set pressure over sampling
   bmp.setCtrlMeasMode(BMP::eCtrlMeasModeNormal);     // set control measurement mode to make these settings effective
+}
 
-  delay(100);
+void setup()
+{
+  // Serial.begin(115200);
+  // Serial.println("Beginning Si1145!");
+  // while (!SI1145.Begin())
+  // {
+  //   Serial.println("Si1145 is not ready!");
+  //   delay(1000);
+  // }
+  // Serial.println("Si1145 is ready!");
+  //delay(1000);
+
+/////////
+  // bmp.reset();
+  // Serial.println("bmp config test");
+  // while(bmp.begin() != BMP::eStatusOK) {
+  //   Serial.println("bmp begin faild");
+  //   printLastOperateStatus(bmp.lastOperateStatus);
+  //   delay(2000);
+  // }
+  // Serial.println("bmp begin success");
+
+  // bmp.setConfigFilter(BMP::eConfigFilter_off);        // set config filter
+  // bmp.setConfigTStandby(BMP::eConfigTStandby_125);    // set standby time
+  // bmp.setCtrlMeasSamplingTemp(BMP::eSampling_X8);     // set temperature over sampling
+  // bmp.setCtrlMeasSamplingPress(BMP::eSampling_X8);    // set pressure over sampling
+  // bmp.setCtrlMeasMode(BMP::eCtrlMeasModeNormal);     // set control measurement mode to make these settings effective
+  //delay(100);
+  SI1145_setup();
+  BMP280_setup();
+  delay(1000);
 //////////
 }
 
