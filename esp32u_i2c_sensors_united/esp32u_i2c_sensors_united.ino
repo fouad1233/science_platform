@@ -100,7 +100,6 @@ void sendSensor() // function to read sensor values and print with Serial librar
 
 void SI1145_setup()
 {
-  Serial.begin(115200);
   Serial.println("Beginning Si1145!");
   while (!SI1145.Begin())
   {
@@ -215,8 +214,10 @@ void setup()
   // bmp.setCtrlMeasSamplingPress(BMP::eSampling_X8);    // set pressure over sampling
   // bmp.setCtrlMeasMode(BMP::eCtrlMeasModeNormal);     // set control measurement mode to make these settings effective
   //delay(100);
+  Serial.begin(115200);
   SI1145_setup();
   BMP280_setup();
+  TSL2591_setup();
   delay(1000);
 //////////
 }
