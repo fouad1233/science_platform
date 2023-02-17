@@ -3,11 +3,14 @@ This file is used to read UV sensor(SI1445) and pressure sensor(BMP280) for now.
 Other i2c sensors will be added to the same file.
 */
 
-#include "Arduino.h"
 #include "SI114X.h"
+#include "Arduino.h"
+
 #include <Wire.h>
 
 #include "DFRobot_BMP280.h"
+#include <Adafruit_Sensor.h>
+#include "Adafruit_TSL2591.h"
 
 
 //UV sensor variables
@@ -24,7 +27,7 @@ float alti;
 
 typedef DFRobot_BMP280_IIC    BMP;    // ******** use abbreviations instead of full names ********
 BMP   bmp(&Wire, BMP::eSdoLow);
-
+Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 
 // show BMP280 last sensor operate status
 void printLastOperateStatus(BMP::eStatus_t eStatus)
@@ -62,6 +65,13 @@ void sendSensor() // function to read sensor values and print with Serial librar
   temp = bmp.getTemperature();
   press = bmp.getPressure();
   alti = bmp.calAltitude(SEA_LEVEL_PRESSURE, press);
+//////// tsl2591
+  // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
+  // That way you can do whatever math and comparisons you want!
+  uint32_t lum = tsl.getFullLuminosity();
+  uint16_t ir, full;
+  ir = lum >> 16;
+  full = lum & 0xFFFF;
 
   Serial.print("\n======== UV SENSOR ========\n");
   Serial.print("visible radiation: ");
@@ -77,6 +87,14 @@ void sendSensor() // function to read sensor values and print with Serial librar
   Serial.print("altitude (unit meter):      "); Serial.println(alti);
   Serial.println("========  end print  ========");
 
+  Serial.print("\n======== TSL2591 ========\n");
+  Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] "));
+  Serial.print(F("IR: ")); Serial.print(ir);  Serial.print(F("  "));
+  Serial.print(F("\nFull: ")); Serial.print(full); Serial.print(F("  "));
+  Serial.print(F("\nVisible: ")); Serial.print(full - ir); Serial.print(F("  "));
+  Serial.print(F("\nLux: ")); Serial.println(tsl.calculateLux(full, ir), 6);
+  Serial.println("========  end print  ========");
+  
 }
 
 
@@ -110,7 +128,65 @@ void BMP280_setup()
   bmp.setCtrlMeasSamplingPress(BMP::eSampling_X8);    // set pressure over sampling
   bmp.setCtrlMeasMode(BMP::eCtrlMeasModeNormal);     // set control measurement mode to make these settings effective
 }
+void TSL2591_setup()
+{ 
+  
+  //////begin the sensor
+  if (tsl.begin()) 
+  {
+    Serial.println(F("Found a TSL2591 sensor"));
+  } 
+  else 
+  {
+    Serial.println(F("No sensor found ... check your wiring?"));
+    while (1);
+  }
+  //////configure the sensor
+  tsl.setGain(TSL2591_GAIN_MED);      // 25x gain
+  tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
 
+   /* Display the gain and integration time for reference sake */  
+  Serial.println(F("------------------------------------"));
+  Serial.print  (F("Gain:         "));
+  tsl2591Gain_t gain = tsl.getGain();
+  switch(gain)
+  {
+    case TSL2591_GAIN_LOW:
+      Serial.println(F("1x (Low)"));
+      break;
+    case TSL2591_GAIN_MED:
+      Serial.println(F("25x (Medium)"));
+      break;
+    case TSL2591_GAIN_HIGH:
+      Serial.println(F("428x (High)"));
+      break;
+    case TSL2591_GAIN_MAX:
+      Serial.println(F("9876x (Max)"));
+      break;
+    }
+    Serial.print  (F("Timing:       "));
+    Serial.print((tsl.getTiming() + 1) * 100, DEC); 
+    Serial.println(F(" ms"));
+    Serial.println(F("------------------------------------"));
+    Serial.println(F(""));
+  }
+  
+  
+
+void advancedRead_TSL2591(void)
+{
+  // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
+  // That way you can do whatever math and comparisons you want!
+  uint32_t lum = tsl.getFullLuminosity();
+  uint16_t ir, full;
+  ir = lum >> 16;
+  full = lum & 0xFFFF;
+  Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] "));
+  Serial.print(F("IR: ")); Serial.print(ir);  Serial.print(F("  "));
+  Serial.print(F("Full: ")); Serial.print(full); Serial.print(F("  "));
+  Serial.print(F("Visible: ")); Serial.print(full - ir); Serial.print(F("  "));
+  Serial.print(F("Lux: ")); Serial.println(tsl.calculateLux(full, ir), 6);
+}
 void setup()
 {
   // Serial.begin(115200);
