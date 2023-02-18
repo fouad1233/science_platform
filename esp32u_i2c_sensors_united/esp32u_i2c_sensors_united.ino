@@ -13,23 +13,23 @@ Other i2c sensors will be added to the same file.
 #include "Adafruit_TSL2591.h"
 
 
-//UV sensor variables
+//UV sensor SI1145 variables
 
 float uv;
 float visible;
 float ir;
+SI114X SI1145 = SI114X(); // initialise sunlight sensor
 
 //BMP280 variables and macros
 float temp;
 uint32_t press;
 float alti;
 #define SEA_LEVEL_PRESSURE    1015.0f   // sea level pressure
-
 typedef DFRobot_BMP280_IIC    BMP;    // ******** use abbreviations instead of full names ********
 BMP   bmp(&Wire, BMP::eSdoLow);
-Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
-SI114X SI1145 = SI114X(); // initialise sunlight sensor
 
+//Light Sensor TSL2591
+Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 
 void setup()
 {
@@ -121,6 +121,7 @@ void TSL2591_setup()
     Serial.println(F("------------------------------------"));
     Serial.println(F(""));
   }
+
 
 void readSensor() // function to read sensor values and print with Serial library
 {
