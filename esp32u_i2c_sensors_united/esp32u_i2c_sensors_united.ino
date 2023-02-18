@@ -12,6 +12,7 @@ Other i2c sensors will be added to the same file.
 #include <Adafruit_Sensor.h>
 #include "Adafruit_TSL2591.h"
 
+#include "MHZ19.h"
 
 //UV sensor SI1145 variables
 
@@ -31,12 +32,18 @@ BMP   bmp(&Wire, BMP::eSdoLow);
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 
+//Co2 Sensor MH-Z19
+const int rx_pin = 16; //Serial rx pin no
+const int tx_pin = 17; //Serial tx pin no
+MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
+
 void setup()
 {
   Serial.begin(115200);
   SI1145_setup();
-  BMP280_setup();
+  //BMP280_setup();
   TSL2591_setup();
+  mhz19_setup();
   delay(1000);
 //////////
 }
@@ -45,6 +52,19 @@ void loop()
 {
   readSensor();
   delay(1000);
+}
+
+void readSensor() // function to read sensor values and print with Serial library
+{
+
+  read_SI1145(); // UV Sensor
+  
+  //read_BMP280(); //Pressure, Temprature and Humidity Sensor
+
+  advancedRead_TSL2591(); // light sensor
+
+  read_mhz19(); //Co2 Sensor
+
 }
 
 //Setup Functions
@@ -123,15 +143,16 @@ void TSL2591_setup()
   }
 
 
-void readSensor() // function to read sensor values and print with Serial library
+void mhz19_setup(void)
 {
+  mhz19_uart->begin(rx_pin, tx_pin);
+  mhz19_uart->setAutoCalibration(true); //AUTO CALIBRATION// IN ORDER TO AUTOCALIBRATE SET setAutoCalibration(true) and calibrateSpan(5000)
+  mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
+  mhz19_uart->calibrateSpan(5000);
 
-  read_SI1145(); // UV Sensor
-  
-  read_BMP280(); //Pressure, Temprature and Humidity Sensor
-
-  advancedRead_TSL2591(); // light sensor
-
+  delay(3000); // Issue #14
+  Serial.print("MH-Z19 now warming up...  status:");
+  Serial.println(mhz19_uart->getStatus());
 }
 
 
@@ -207,3 +228,16 @@ void advancedRead_TSL2591(void)
   Serial.println("========  end print  ========");
 }
 
+void read_mhz19(void)
+{
+  measurement_t m = mhz19_uart->getMeasurement();
+
+  Serial.print("\n======== MH-Z19 ========\n");
+  Serial.print("co2: ");
+  Serial.println(m.co2_ppm);
+  
+  Serial.print("temp: ");
+  Serial.println(m.temperature);
+  Serial.println("========  end print  ========");
+
+}

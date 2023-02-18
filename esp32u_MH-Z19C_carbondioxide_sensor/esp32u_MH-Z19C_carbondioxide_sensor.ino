@@ -15,9 +15,9 @@ void setup()
 {
     Serial.begin(9600); //115200
     mhz19_uart->begin(rx_pin, tx_pin);
-    mhz19_uart->setAutoCalibration(false); //AUTO CALIBRATION// IN ORDER TO AUTOCALIBRATE SET setAutoCalibration(true) and calibrateSpan(5000)
-    //mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
-    //mhz19_uart->calibrateSpan(5000);
+    mhz19_uart->setAutoCalibration(true); //AUTO CALIBRATION// IN ORDER TO AUTOCALIBRATE SET setAutoCalibration(true) and calibrateSpan(5000)
+    mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
+    mhz19_uart->calibrateSpan(5000);
 
     delay(3000); // Issue #14
     Serial.print("MH-Z19 now warming up...  status:");
