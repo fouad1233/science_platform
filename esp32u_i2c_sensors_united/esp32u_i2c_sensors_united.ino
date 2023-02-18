@@ -47,52 +47,7 @@ void loop()
   delay(1000);
 }
 
-
-
-// show BMP280 last sensor operate status
-void printLastOperateStatus(BMP::eStatus_t eStatus)
-{
-  switch(eStatus) {
-    case BMP::eStatusOK:
-      Serial.println("everything ok");
-      break;
-    case BMP::eStatusErr:   
-      Serial.println("unknow error");
-      break;
-    case BMP::eStatusErrDeviceNotDetected:
-      Serial.println("device not detected");
-      break;
-    case BMP::eStatusErrParameter:
-      Serial.println("parameter error");
-      break;
-    default: 
-      Serial.println("unknow status");
-      break;
-  }
-}
-
-
-void readSensor() // function to read sensor values and print with Serial library
-{
-
-  read_SI1145(); // UV Sensor
-
-//////// Pressure Sensor
-  
-  temp = bmp.getTemperature();
-  press = bmp.getPressure();
-  alti = bmp.calAltitude(SEA_LEVEL_PRESSURE, press);
-
-  Serial.print("\n======== BMP280 ========\n");
-  Serial.print("temperature (unit Celsius): "); Serial.println(temp);
-  Serial.print("pressure (unit pa):         "); Serial.println(press);
-  Serial.print("altitude (unit meter):      "); Serial.println(alti);
-  Serial.println("========  end print  ========");
-
-  advancedRead_TSL2591(); // light sensor
-}
-
-
+//Setup Functions
 void SI1145_setup()
 {
   Serial.println("Beginning Si1145!");
@@ -166,7 +121,42 @@ void TSL2591_setup()
     Serial.println(F("------------------------------------"));
     Serial.println(F(""));
   }
+
+void readSensor() // function to read sensor values and print with Serial library
+{
+
+  read_SI1145(); // UV Sensor
   
+  read_BMP280(); //Pressure, Temprature and Humidity Sensor
+
+  advancedRead_TSL2591(); // light sensor
+
+}
+
+
+// show BMP280 last sensor operate status
+void printLastOperateStatus(BMP::eStatus_t eStatus)
+{
+  switch(eStatus) {
+    case BMP::eStatusOK:
+      Serial.println("everything ok");
+      break;
+    case BMP::eStatusErr:   
+      Serial.println("unknow error");
+      break;
+    case BMP::eStatusErrDeviceNotDetected:
+      Serial.println("device not detected");
+      break;
+    case BMP::eStatusErrParameter:
+      Serial.println("parameter error");
+      break;
+    default: 
+      Serial.println("unknow status");
+      break;
+  }
+}
+
+
 void read_SI1145(void)
 {
   visible = SI1145.ReadVisible(); // visible radiation
@@ -180,6 +170,21 @@ void read_SI1145(void)
   Serial.println(ir);
   Serial.print("UV index: ");
   Serial.println(uv/100);
+  Serial.println("========  end print  ========");
+}
+
+
+void read_BMP280(void)
+{
+
+  temp = bmp.getTemperature();
+  press = bmp.getPressure();
+  alti = bmp.calAltitude(SEA_LEVEL_PRESSURE, press);
+
+  Serial.print("\n======== BMP280 ========\n");
+  Serial.print("temperature (unit Celsius): "); Serial.println(temp);
+  Serial.print("pressure (unit pa):         "); Serial.println(press);
+  Serial.print("altitude (unit meter):      "); Serial.println(alti);
   Serial.println("========  end print  ========");
 
 }
