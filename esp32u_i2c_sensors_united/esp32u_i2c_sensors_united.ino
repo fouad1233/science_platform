@@ -8,7 +8,7 @@ Other i2c sensors will be added to the same file.
 
 #include <Wire.h>
 
-#include "DFRobot_BMP280.h"
+#include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_TSL2591.h"
 
@@ -22,12 +22,10 @@ float ir;
 SI114X SI1145 = SI114X(); // initialise sunlight sensor
 
 //BMP280 variables and macros
-float temp;
-uint32_t press;
-float alti;
-#define SEA_LEVEL_PRESSURE    1015.0f   // sea level pressure
-typedef DFRobot_BMP280_IIC    BMP;    // ******** use abbreviations instead of full names ********
-BMP   bmp(&Wire, BMP::eSdoLow);
+#define SEALEVELPRESSURE_HPA (1024.00)   // sea level pressure
+Adafruit_BME280 bme; // I2C
+//Adafruit_BME280 bme(BME_CS); // hardware SPI
+//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
@@ -41,7 +39,7 @@ void setup()
 {
   Serial.begin(115200);
   SI1145_setup();
-  //BMP280_setup();
+  BME280_setup();
   TSL2591_setup();
   mhz19_setup();
   delay(1000);
@@ -59,7 +57,7 @@ void readSensor() // function to read sensor values and print with Serial librar
 
   read_SI1145(); // UV Sensor
   
-  //read_BMP280(); //Pressure, Temprature and Humidity Sensor
+  read_BME280(); //Pressure, Temprature and Humidity Sensor
 
   advancedRead_TSL2591(); // light sensor
 
@@ -80,22 +78,29 @@ void SI1145_setup()
 }
 
 
-void BMP280_setup()
+void BME280_setup()
 {
-  bmp.reset();
-  Serial.println("bmp config test");
-  while(bmp.begin() != BMP::eStatusOK) {
-    Serial.println("bmp begin faild");
-    printLastOperateStatus(bmp.lastOperateStatus);
-    delay(2000);
-  }
-  Serial.println("bmp begin success");
+  while(!Serial);    // time to get serial running
+  Serial.println(F("BME280 test"));
 
-  bmp.setConfigFilter(BMP::eConfigFilter_off);        // set config filter
-  bmp.setConfigTStandby(BMP::eConfigTStandby_125);    // set standby time
-  bmp.setCtrlMeasSamplingTemp(BMP::eSampling_X8);     // set temperature over sampling
-  bmp.setCtrlMeasSamplingPress(BMP::eSampling_X8);    // set pressure over sampling
-  bmp.setCtrlMeasMode(BMP::eCtrlMeasModeNormal);     // set control measurement mode to make these settings effective
+  unsigned status;
+  
+  // default settings
+  status = bme.begin(0x76);  
+  // You can also pass in a Wire library object like &Wire2
+  // status = bme.begin(0x76, &Wire2)
+  if (!status) {
+      Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+//        Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
+      Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+      Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
+      Serial.print("        ID of 0x60 represents a BME 280.\n");
+      Serial.print("        ID of 0x61 represents a BME 680.\n");
+      while (1) delay(10);
+  }
+  
+  Serial.println("-- Default Test --");
+  Serial.println();
 }
 
 
@@ -157,26 +162,26 @@ void mhz19_setup(void)
 
 
 // show BMP280 last sensor operate status
-void printLastOperateStatus(BMP::eStatus_t eStatus)
-{
-  switch(eStatus) {
-    case BMP::eStatusOK:
-      Serial.println("everything ok");
-      break;
-    case BMP::eStatusErr:   
-      Serial.println("unknow error");
-      break;
-    case BMP::eStatusErrDeviceNotDetected:
-      Serial.println("device not detected");
-      break;
-    case BMP::eStatusErrParameter:
-      Serial.println("parameter error");
-      break;
-    default: 
-      Serial.println("unknow status");
-      break;
-  }
-}
+// void printLastOperateStatus(BMP::eStatus_t eStatus)
+// {
+//   switch(eStatus) {
+//     case BMP::eStatusOK:
+//       Serial.println("everything ok");
+//       break;
+//     case BMP::eStatusErr:   
+//       Serial.println("unknow error");
+//       break;
+//     case BMP::eStatusErrDeviceNotDetected:
+//       Serial.println("device not detected");
+//       break;
+//     case BMP::eStatusErrParameter:
+//       Serial.println("parameter error");
+//       break;
+//     default: 
+//       Serial.println("unknow status");
+//       break;
+//   }
+// }
 
 
 void read_SI1145(void)
@@ -196,19 +201,27 @@ void read_SI1145(void)
 }
 
 
-void read_BMP280(void)
+void read_BME280(void)
 {
+  Serial.print("\n======== BME280 ========\n");
+  Serial.print("Temperature = ");
+  Serial.print(bme.readTemperature());
+  Serial.println(" Celcius");
 
-  temp = bmp.getTemperature();
-  press = bmp.getPressure();
-  alti = bmp.calAltitude(SEA_LEVEL_PRESSURE, press);
+  Serial.print("Pressure = ");
 
-  Serial.print("\n======== BMP280 ========\n");
-  Serial.print("temperature (unit Celsius): "); Serial.println(temp);
-  Serial.print("pressure (unit pa):         "); Serial.println(press);
-  Serial.print("altitude (unit meter):      "); Serial.println(alti);
+  Serial.print(bme.readPressure() / 100.0F );
+  Serial.println(" hPa");
+
+  Serial.print("Approx. Altitude = ");
+  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.println(" m");
+
+  Serial.print("Humidity = ");
+  Serial.print(bme.readHumidity());
+  Serial.println(" %");
+
   Serial.println("========  end print  ========");
-
 }
 
 void advancedRead_TSL2591(void)
@@ -235,7 +248,7 @@ void read_mhz19(void)
   Serial.print("\n======== MH-Z19 ========\n");
   Serial.print("co2: ");
   Serial.println(m.co2_ppm);
-  
+
   Serial.print("temp: ");
   Serial.println(m.temperature);
   Serial.println("========  end print  ========");
