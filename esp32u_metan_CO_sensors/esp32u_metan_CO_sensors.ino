@@ -1,5 +1,5 @@
 int LED = 32;            /*LED pin defined*/
-int Sensor_input = 4;    /*Digital pin 5 for sensor input*/
+#define Sensor_input 33    /*Digital pin 5 for sensor input*/
 float gas_value = 0;
 int adc_resolution = 4095;
 void setup() {
@@ -17,7 +17,7 @@ void loop() {
   Serial.print("Gas Value: ");
   Serial.print(gas_value);
   Serial.print("ppm\t");
-  if (sensor_Aout > 1200) {    /*if condition with threshold 1800*/
+  if (gas_value > 1200) {    /*if condition with threshold 1800*/
     Serial.println("Gas");  
     digitalWrite (LED, LOW) ; /*LED set HIGH if Gas detected */
   }
