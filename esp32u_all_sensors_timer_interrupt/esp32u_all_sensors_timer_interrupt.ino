@@ -69,6 +69,12 @@ void read_MIX8410(void);
 float readO2Vout(void);
 float readConcentration(void);
 
+// timer
+hw_timer_t *My_timer = NULL;
+void IRAM_ATTR onTimer()
+{
+  readSensor();
+}
 
 void setup()
 {
@@ -77,21 +83,17 @@ void setup()
   BME280_setup();
   TSL2591_setup();
   mhz19_setup();
-  delay(1000);
+  delay(3000);
+  My_timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(My_timer, &onTimer, true);
+  timerAlarmWrite(My_timer, 3000000, true);
+  timerAlarmEnable(My_timer); //Just Enable
 }
 
 
 void loop()
 {
-  
-  for(int i=0;i<30;i++)
-  {
-    Serial.println();
-  }
-
-  readSensor();
-
-  delay(2000);
+  delay(10000);
 }
 
 
@@ -116,13 +118,11 @@ void readSensor(void) // function to read sensor values and print with Serial li
 ///////////SETUP FUNCTIONS///////////
 void SI1145_setup(void)
 {
-  Serial.println("Beginning Si1145!");
   while (!SI1145.Begin())
   {
     Serial.println("Si1145 is not ready!");
     delay(1000);
   }
-  Serial.println("Si1145 is ready!");
 }
 
 
@@ -135,20 +135,10 @@ void BME280_setup(void)
   
   // default settings
   status = bme.begin(0x76);  
-  // You can also pass in a Wire library object like &Wire2
-  // status = bme.begin(0x76, &Wire2)
   if (!status) {
       Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-//        Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
-      Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
-      Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
-      Serial.print("        ID of 0x60 represents a BME 280.\n");
-      Serial.print("        ID of 0x61 represents a BME 680.\n");
       while (1) delay(10);
   }
-  
-  Serial.println("-- Default Test --");
-  Serial.println();
 }
 
 
@@ -158,7 +148,7 @@ void TSL2591_setup(void)
   //////begin the sensor
   if (tsl.begin()) 
   {
-    Serial.println(F("Found a TSL2591 sensor"));
+    
   } 
   else 
   {
@@ -170,29 +160,8 @@ void TSL2591_setup(void)
   tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
 
    /* Display the gain and integration time for reference sake */  
-  Serial.println(F("------------------------------------"));
-  Serial.print  (F("Gain:         "));
+  
   tsl2591Gain_t gain = tsl.getGain();
-  switch(gain)
-  {
-    case TSL2591_GAIN_LOW:
-      Serial.println(F("1x (Low)"));
-      break;
-    case TSL2591_GAIN_MED:
-      Serial.println(F("25x (Medium)"));
-      break;
-    case TSL2591_GAIN_HIGH:
-      Serial.println(F("428x (High)"));
-      break;
-    case TSL2591_GAIN_MAX:
-      Serial.println(F("9876x (Max)"));
-      break;
-    }
-    Serial.print  (F("Timing:       "));
-    Serial.print((tsl.getTiming() + 1) * 100, DEC); 
-    Serial.println(F(" ms"));
-    Serial.println(F("------------------------------------"));
-    Serial.println(F(""));
   }
 
 
@@ -203,9 +172,7 @@ void mhz19_setup(void)
   mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
   mhz19_uart->calibrateSpan(5000);
 
-  delay(3000); // Issue #14
-  Serial.print("MH-Z19 now warming up...  status:");
-  Serial.println(mhz19_uart->getStatus());
+  //delay(3000); // Issue #14
 }
 
 
