@@ -21,15 +21,21 @@ float visible;
 float ir;
 SI114X SI1145 = SI114X(); // initialise sunlight sensor
 
-//BMP280 variables and macros
+//BME280 variables and macros
 #define SEALEVELPRESSURE_HPA (1024.00)   // sea level pressure
 Adafruit_BME280 bme; // I2C
-//Adafruit_BME280 bme(BME_CS); // hardware SPI
-//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
+int temp_BME;
+int pressure;
+int altitude;
+int humidity;
 
 
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
+uint32_t lum;
+uint16_t ir, full;
+uint16_t visible;
+uint16_t lux;
 
 
 //Co2 Sensor MH-Z19
@@ -196,47 +202,61 @@ void read_SI1145(void)
   Serial.println(ir);
   Serial.print("UV index: ");
   Serial.println(uv);
-  //Serial.println("========  end print  ========");
 }
 
 
 void read_BME280(void)
 {
+  temp_BME = bme.readTemperature();
+  pressure = bme.readPressure() / 100.0F;
+  altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  humidity = bme.readHumidity();
+
+
   Serial.print("\n======== BME280 ========\n");
   Serial.print("Temperature = ");
-  Serial.print(bme.readTemperature());
+  Serial.print(temp_BME);
   Serial.println(" Celcius");
 
   Serial.print("Pressure = ");
-
-  Serial.print(bme.readPressure() / 100.0F );
+  Serial.print(pressure);
   Serial.println(" hPa");
 
   Serial.print("Approx. Altitude = ");
-  Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+  Serial.print(altitude);
   Serial.println(" m");
 
   Serial.print("Humidity = ");
-  Serial.print(bme.readHumidity());
+  Serial.print(humidity);
   Serial.println(" %");
-
-  //Serial.println("========  end print  ========");
 }
 
 void advancedRead_TSL2591(void)
 {
   // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
   // That way you can do whatever math and comparisons you want!
-  uint32_t lum = tsl.getFullLuminosity();
-  uint16_t ir, full;
+
+  //uint32_t lum = tsl.getFullLuminosity();
+  //uint16_t ir, full;
+
+  lum = tsl.getFullLuminosity();
   ir = lum >> 16;
   full = lum & 0xFFFF;
+  visible = full - ir;
+  lux = tsl.calculateLux(full, ir);
+
   Serial.print("\n======== TSL2591 ========\n");
-  Serial.print(F("[ ")); Serial.print(millis()); Serial.print(F(" ms ] \n"));
-  Serial.print(F("IR: ")); Serial.print(ir);  Serial.print(F("  \n"));
-  Serial.print(F("Full: ")); Serial.print(full); Serial.print(F("  \n"));
-  Serial.print(F("Visible: ")); Serial.print(full - ir); Serial.print(F("  \n"));
-  Serial.print(F("Lux: ")); Serial.println(tsl.calculateLux(full, ir), 6);
+  Serial.print(F("IR: ")); 
+  Serial.print(ir);  
+  Serial.print(F("  \n"));
+  Serial.print(F("Full: ")); 
+  Serial.print(full); 
+  Serial.print(F("  \n"));
+  Serial.print(F("Visible: ")); 
+  Serial.print(visible); 
+  Serial.print(F("  \n"));
+  Serial.print(F("Lux: ")); 
+  Serial.println(lux, 6);
   //Serial.println("========  end print  ========");
 }
 
