@@ -54,7 +54,7 @@ const float VRefer = 3.3;       // voltage of adc reference
 const int O2_pin = 4;
 
 //Functions
-void readsensor(void);
+void readSensor(void);
 void SI1145_setup(void);
 void BME280_setup(void);
 void TSL2591_setup(void);
@@ -68,7 +68,6 @@ void read_MQ4(void);
 void read_MIX8410(void);
 float readO2Vout(void);
 float readConcentration(void);
-
 
 
 void setup()
