@@ -13,7 +13,7 @@ Other i2c sensors will be added to the same file.
 #include "Adafruit_TSL2591.h"
 
 #include "MHZ19.h"
-
+int read_sensor_flag;
 //UV sensor SI1145 variables
 
 float uv;
@@ -73,7 +73,8 @@ float readConcentration(void);
 hw_timer_t *My_timer = NULL;
 void IRAM_ATTR onTimer()
 {
-  readSensor();
+  read_sensor_flag = 1;
+  //readSensor();
 }
 
 void setup()
@@ -87,13 +88,17 @@ void setup()
   
   My_timer = timerBegin(0, 80, true);
   timerAttachInterrupt(My_timer, &onTimer, true);
-  timerAlarmWrite(My_timer, 3000000, true);
+  timerAlarmWrite(My_timer, 1000000, true);
   timerAlarmEnable(My_timer); //Just Enable
 }
 
 
 void loop()
 {
+  if (read_sensor_flag ){
+    readSensor();
+    read_sensor_flag = 0;
+  }
   //delay(10000);
 }
 
