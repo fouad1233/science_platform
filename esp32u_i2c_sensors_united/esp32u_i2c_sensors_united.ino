@@ -53,6 +53,23 @@ int met_Aout;
 const float VRefer = 3.3;       // voltage of adc reference
 const int O2_pin = 4;
 
+//Functions
+void readsensor(void);
+void SI1145_setup(void);
+void BME280_setup(void);
+void TSL2591_setup(void);
+void mhz19_setup(void);
+void read_SI1145(void);
+void read_BME280(void);
+void advancedRead_TSL2591(void);
+void read_mhz19(void);
+void read_MQ7(void);
+void read_MQ4(void);
+void read_MIX8410(void);
+float readO2Vout(void);
+float readConcentration(void);
+
+
 
 void setup()
 {
@@ -79,7 +96,7 @@ void loop()
 }
 
 
-void readSensor() // function to read sensor values and print with Serial library
+void readSensor(void) // function to read sensor values and print with Serial library
 {
   read_SI1145(); // UV Sensor
   
@@ -98,7 +115,7 @@ void readSensor() // function to read sensor values and print with Serial librar
 
 
 ///////////SETUP FUNCTIONS///////////
-void SI1145_setup()
+void SI1145_setup(void)
 {
   Serial.println("Beginning Si1145!");
   while (!SI1145.Begin())
@@ -110,7 +127,7 @@ void SI1145_setup()
 }
 
 
-void BME280_setup()
+void BME280_setup(void)
 {
   while(!Serial);    // time to get serial running
   Serial.println(F("BME280 test"));
@@ -136,7 +153,7 @@ void BME280_setup()
 }
 
 
-void TSL2591_setup()
+void TSL2591_setup(void)
 { 
   
   //////begin the sensor
@@ -323,7 +340,7 @@ void read_MIX8410(void)
 
 
 //MIX8410 O2 Sensor Helper Func
-float readO2Vout()
+float readO2Vout(void)
 {
     long sum = 0;
     for(int i=0; i<32; i++)
@@ -339,7 +356,7 @@ float readO2Vout()
 
 
 //MIX8410 O2 Sensor Helper Func
-float readConcentration()
+float readConcentration(void)
 {
     // Vout samples are with reference to 3.3V
     float MeasuredVout = readO2Vout();
