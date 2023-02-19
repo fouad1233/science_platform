@@ -20,7 +20,7 @@
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-
+#include <ArduinoJson.h>
 
 #define SEALEVELPRESSURE_HPA (1024.00)
 
@@ -28,6 +28,7 @@ Adafruit_BME280 bme; // I2C
 //Adafruit_BME280 bme(BME_CS); // hardware SPI
 //Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
+StaticJsonDocument<48> doc;
 unsigned long delayTime;
 float temperature,pressure,altitude,humidity;
 
@@ -60,8 +61,17 @@ void setup() {
 
 
 void loop() { 
-    printValues();
+    //printValues();
+    getValues();
+    json_data_set();
+    serializeJson(doc, Serial);
     delay(delayTime);
+    Serial.println();
+}
+void json_data_set(void){
+  doc["temp"] = temperature;
+  doc["humidity"] = humidity;
+  doc["pressure"] = pressure;
 }
 
 void getValues(){
@@ -69,9 +79,8 @@ void getValues(){
   pressure = bme.readPressure() / 100.0F;
   altitude = bme.readAltitude( SEALEVELPRESSURE_HPA );
   humidity = bme.readHumidity();
-  
-  
 }
+
 void printValues() {
     Serial.print("Temperature = ");
     Serial.print(temperature);
