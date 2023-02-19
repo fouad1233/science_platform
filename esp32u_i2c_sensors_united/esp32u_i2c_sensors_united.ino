@@ -291,7 +291,7 @@ void read_MQ7(void) //CO Sensor
   Serial.print("\nGas Value: ");
   Serial.print(CO_gas_val);
   Serial.print("ppm\t");
-  if (CO_gas_val > 1200) {    /*if condition with threshold 1800*/
+  if (CO_Aout > 1200) {    /*if condition with threshold 1800*/
     Serial.println("Gas");  
     //digitalWrite (LED, LOW) ; /*LED set HIGH if Gas detected */
   }
@@ -313,7 +313,7 @@ void read_MQ4(void)
   Serial.print("\nGas Value: ");
   Serial.print(met_gas_val);
   Serial.print("ppm\t");
-  if (met_gas_val > 1200) {    /*if condition with threshold 1800*/
+  if (met_Aout > 1200) {    /*if condition with threshold 1800*/
     Serial.println("Gas");  
     //digitalWrite (LED, LOW) ; /*LED set HIGH if Gas detected */
   }

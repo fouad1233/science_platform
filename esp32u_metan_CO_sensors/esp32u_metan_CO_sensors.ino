@@ -17,7 +17,7 @@ void loop() {
   Serial.print("Gas Value: ");
   Serial.print(gas_value);
   Serial.print("ppm\t");
-  if (gas_value > 1200) {    /*if condition with threshold 1800*/
+  if (sensor_Aout > 1200) {    /*if condition with threshold 1800*/
     Serial.println("Gas");  
     digitalWrite (LED, LOW) ; /*LED set HIGH if Gas detected */
   }
