@@ -33,8 +33,8 @@ int humidity;
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 uint32_t lum;
-uint16_t ir, full;
-uint16_t visible;
+uint16_t ir_SI, full;
+uint16_t visible_SI;
 uint16_t lux;
 
 
@@ -42,6 +42,8 @@ uint16_t lux;
 const int rx_pin = 16; //Serial rx pin no
 const int tx_pin = 17; //Serial tx pin no
 MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
+int co2_concentration;
+int co2_temp;
 
 
 //CO Sensor MQ7 and CH4 Sensor MQ4
@@ -53,6 +55,8 @@ int CO_Aout;
 #define MQ4_input 33
 float met_gas_val = 0;
 int met_Aout;
+
+int o2_concentration; //O2 sensor o2 concentration
 
 
 //O2 Sensor MIX8410
@@ -240,20 +244,20 @@ void advancedRead_TSL2591(void)
   //uint16_t ir, full;
 
   lum = tsl.getFullLuminosity();
-  ir = lum >> 16;
+  ir_SI = lum >> 16;
   full = lum & 0xFFFF;
-  visible = full - ir;
-  lux = tsl.calculateLux(full, ir);
+  visible_SI = full - ir_SI;
+  lux = tsl.calculateLux(full, ir_SI);
 
   Serial.print("\n======== TSL2591 ========\n");
   Serial.print(F("IR: ")); 
-  Serial.print(ir);  
+  Serial.print(ir_SI);  
   Serial.print(F("  \n"));
   Serial.print(F("Full: ")); 
   Serial.print(full); 
   Serial.print(F("  \n"));
   Serial.print(F("Visible: ")); 
-  Serial.print(visible); 
+  Serial.print(visible_SI); 
   Serial.print(F("  \n"));
   Serial.print(F("Lux: ")); 
   Serial.println(lux, 6);
@@ -263,13 +267,14 @@ void advancedRead_TSL2591(void)
 void read_mhz19(void)
 {
   measurement_t m = mhz19_uart->getMeasurement();
+  co2_concentration = m.co2_ppm;
+  co2_temp = m.temperature;
 
   Serial.print("\n======== MH-Z19 ========\n");
   Serial.print("co2: ");
-  Serial.println(m.co2_ppm);
-
+  Serial.println(co2_concentration);
   Serial.print("temp: ");
-  Serial.println(m.temperature);
+  Serial.println(co2_temp);
   //Serial.println("========  end print  ========");
 }
 
@@ -278,6 +283,7 @@ void read_MQ7(void) //CO Sensor
 {
   CO_Aout = analogRead(MQ7_input);  /*Analog value read function*/
   CO_gas_val = (9800/adc_resolution)*CO_Aout+200;
+
   Serial.print("\n======== MQ-7 CO ========\n");
   Serial.print("Gas Sensor: ");  
   Serial.print(CO_Aout);   /*Read value printed*/
@@ -300,6 +306,7 @@ void read_MQ4(void)
 {
   met_Aout = analogRead(MQ4_input);  /*Analog value read function*/
   met_gas_val = (9800/adc_resolution)*met_Aout+200;
+
   Serial.print("\n======== MQ-4 METHANE ========\n");
   Serial.print("Gas Sensor: ");  
   Serial.print(met_Aout);   /*Read value printed*/
@@ -320,13 +327,14 @@ void read_MQ4(void)
 
 void read_MIX8410(void)
 {
+  o2_concentration = readConcentration();
   //float Vout =0;
   Serial.print("\n======== MIX8410 O2 ========\n");
   //Serial.print("Vout =");
   //Vout = readO2Vout();
   //Serial.print(Vout);
   Serial.print("O2 Concentration: ");
-  Serial.println(readConcentration());
+  Serial.println(o2_concentration);
   //Serial.println("========  end print  ========");
 }
 
