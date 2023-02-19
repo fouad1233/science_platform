@@ -84,6 +84,7 @@ void setup()
   TSL2591_setup();
   mhz19_setup();
   delay(3000);
+  
   My_timer = timerBegin(0, 80, true);
   timerAttachInterrupt(My_timer, &onTimer, true);
   timerAlarmWrite(My_timer, 3000000, true);
@@ -93,7 +94,7 @@ void setup()
 
 void loop()
 {
-  delay(10000);
+  //delay(10000);
 }
 
 
@@ -172,7 +173,7 @@ void mhz19_setup(void)
   mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
   mhz19_uart->calibrateSpan(5000);
 
-  //delay(3000); // Issue #14
+  //delay(3000); // Issue #14 //
 }
 
 
@@ -294,10 +295,10 @@ void read_MQ4(void)
 
 void read_MIX8410(void)
 {
-  float Vout =0;
+  //float Vout =0;
   Serial.print("\n======== MIX8410 O2 ========\n");
   //Serial.print("Vout =");
-  Vout = readO2Vout();
+  //Vout = readO2Vout();
   //Serial.print(Vout);
   Serial.print("O2 Concentration: ");
   Serial.println(readConcentration());
