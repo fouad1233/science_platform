@@ -33,8 +33,8 @@ int humidity;
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 uint32_t lum;
-uint16_t ir, full;
-uint16_t visible;
+uint16_t ir_SI, full;
+uint16_t visible_SI;
 uint16_t lux;
 
 
@@ -240,20 +240,20 @@ void advancedRead_TSL2591(void)
   //uint16_t ir, full;
 
   lum = tsl.getFullLuminosity();
-  ir = lum >> 16;
+  ir_SI = lum >> 16;
   full = lum & 0xFFFF;
-  visible = full - ir;
-  lux = tsl.calculateLux(full, ir);
+  visible_SI = full - ir_SI;
+  lux = tsl.calculateLux(full, ir_SI);
 
   Serial.print("\n======== TSL2591 ========\n");
   Serial.print(F("IR: ")); 
-  Serial.print(ir);  
+  Serial.print(ir_SI);  
   Serial.print(F("  \n"));
   Serial.print(F("Full: ")); 
   Serial.print(full); 
   Serial.print(F("  \n"));
   Serial.print(F("Visible: ")); 
-  Serial.print(visible); 
+  Serial.print(visible_SI); 
   Serial.print(F("  \n"));
   Serial.print(F("Lux: ")); 
   Serial.println(lux, 6);
@@ -263,7 +263,8 @@ void advancedRead_TSL2591(void)
 void read_mhz19(void)
 {
   measurement_t m = mhz19_uart->getMeasurement();
-
+  co2_concentration = m.co2_ppm;
+  co2_temp = m.temprature;
   Serial.print("\n======== MH-Z19 ========\n");
   Serial.print("co2: ");
   Serial.println(m.co2_ppm);
