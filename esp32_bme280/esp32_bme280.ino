@@ -29,9 +29,10 @@ Adafruit_BME280 bme; // I2C
 //Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
 unsigned long delayTime;
+float temperature,pressure,altitude,humidity;
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(115200);
     while(!Serial);    // time to get serial running
     Serial.println(F("BME280 test"));
 
@@ -63,23 +64,30 @@ void loop() {
     delay(delayTime);
 }
 
-
+void getValues(){
+  temperature = bme.readTemperature();
+  pressure = bme.readPressure() / 100.0F;
+  altitude = bme.readAltitude( SEALEVELPRESSURE_HPA );
+  humidity = bme.readHumidity();
+  
+  
+}
 void printValues() {
     Serial.print("Temperature = ");
-    Serial.print(bme.readTemperature());
+    Serial.print(temperature);
     Serial.println(" C");
 
     Serial.print("Pressure = ");
 
-    Serial.print(bme.readPressure() / 100.0F );
+    Serial.print(pressure / 100.0F );
     Serial.println(" hPa");
 
     Serial.print("Approx. Altitude = ");
-    Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
+    Serial.print(altitude);
     Serial.println(" m");
 
     Serial.print("Humidity = ");
-    Serial.print(bme.readHumidity());
+    Serial.print(humidity);
     Serial.println(" %");
 
     Serial.println();
