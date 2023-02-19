@@ -64,7 +64,7 @@ const float VRefer = 3.3;       // voltage of adc reference
 const int O2_pin = 4;
 
 //Functions
-void readSensor(void);
+void readAllSensors(void);
 void SI1145_setup(void);
 void BME280_setup(void);
 void TSL2591_setup(void);
@@ -79,7 +79,17 @@ void read_MIX8410(void);
 float readO2Vout(void);
 float readConcentration(void);
 
-// timer
+void printAllSensors(void);
+void print_SI1145(void);
+void print_BME280(void);
+void print_TSL2591(void);
+void print_mhz19(void);
+void print_MQ7(void);
+void print_MQ4(void);
+void print_MIX8410(void);
+
+
+// TIMER SETUP
 hw_timer_t *My_timer = NULL;
 void IRAM_ATTR onTimer()
 {
@@ -106,14 +116,15 @@ void setup()
 void loop()
 {
   if (read_sensor_flag ){
-    readSensor();
+    readAllSensors();
+    printAllSensors();
     read_sensor_flag = 0;
   }
   //delay(10000);
 }
 
 
-void readSensor(void) // function to read sensor values and print with Serial library
+void readAllSensors(void) // function to read sensor values and print with Serial library
 {
   read_SI1145(); // UV Sensor
   
@@ -128,6 +139,17 @@ void readSensor(void) // function to read sensor values and print with Serial li
   read_MQ4(); // MQ4 METHANE Sensor
 
   read_MIX8410(); // MIX8410 O2 Sensor
+}
+
+void printAllSensors(void)
+{
+  print_SI1145();
+  print_BME280();
+  print_TSL2591();
+  print_mhz19();
+  print_MQ7();
+  print_MQ4();
+  print_MIX8410();
 }
 
 
@@ -199,6 +221,17 @@ void read_SI1145(void)
   ir = SI1145.ReadIR(); // IR radiation
   uv = SI1145.ReadUV(); // UV index
 
+  // Serial.print("\n======== UV SENSOR ========\n");
+  // Serial.print("visible radiation: ");
+  // Serial.println(visible);
+  // Serial.print("IR radiation: ");
+  // Serial.println(ir);
+  // Serial.print("UV index: ");
+  // Serial.println(uv);
+}
+
+void print_SI1145(void)
+{
   Serial.print("\n======== UV SENSOR ========\n");
   Serial.print("visible radiation: ");
   Serial.println(visible);
@@ -217,6 +250,26 @@ void read_BME280(void)
   humidity = bme.readHumidity();
 
 
+  // Serial.print("\n======== BME280 ========\n");
+  // Serial.print("Temperature = ");
+  // Serial.print(temp_BME);
+  // Serial.println(" Celcius");
+
+  // Serial.print("Pressure = ");
+  // Serial.print(pressure);
+  // Serial.println(" hPa");
+
+  // Serial.print("Approx. Altitude = ");
+  // Serial.print(altitude);
+  // Serial.println(" m");
+
+  // Serial.print("Humidity = ");
+  // Serial.print(humidity);
+  // Serial.println(" %");
+}
+
+void print_BME280(void)
+{
   Serial.print("\n======== BME280 ========\n");
   Serial.print("Temperature = ");
   Serial.print(temp_BME);
@@ -249,6 +302,22 @@ void advancedRead_TSL2591(void)
   visible_SI = full - ir_SI;
   lux = tsl.calculateLux(full, ir_SI);
 
+  // Serial.print("\n======== TSL2591 ========\n");
+  // Serial.print(F("IR: ")); 
+  // Serial.print(ir_SI);  
+  // Serial.print(F("  \n"));
+  // Serial.print(F("Full: ")); 
+  // Serial.print(full); 
+  // Serial.print(F("  \n"));
+  // Serial.print(F("Visible: ")); 
+  // Serial.print(visible_SI); 
+  // Serial.print(F("  \n"));
+  // Serial.print(F("Lux: ")); 
+  // Serial.println(lux, 6);
+}
+
+void print_TSL2591(void)
+{
   Serial.print("\n======== TSL2591 ========\n");
   Serial.print(F("IR: ")); 
   Serial.print(ir_SI);  
@@ -261,7 +330,6 @@ void advancedRead_TSL2591(void)
   Serial.print(F("  \n"));
   Serial.print(F("Lux: ")); 
   Serial.println(lux, 6);
-  //Serial.println("========  end print  ========");
 }
 
 void read_mhz19(void)
@@ -270,12 +338,20 @@ void read_mhz19(void)
   co2_concentration = m.co2_ppm;
   co2_temp = m.temperature;
 
+  // Serial.print("\n======== MH-Z19 ========\n");
+  // Serial.print("co2: ");
+  // Serial.println(co2_concentration);
+  // Serial.print("temp: ");
+  // Serial.println(co2_temp);
+}
+
+void print_mhz19(void)
+{
   Serial.print("\n======== MH-Z19 ========\n");
   Serial.print("co2: ");
   Serial.println(co2_concentration);
   Serial.print("temp: ");
   Serial.println(co2_temp);
-  //Serial.println("========  end print  ========");
 }
 
 
@@ -284,6 +360,24 @@ void read_MQ7(void) //CO Sensor
   CO_Aout = analogRead(MQ7_input);  /*Analog value read function*/
   CO_gas_val = (9800/adc_resolution)*CO_Aout+200;
 
+  // Serial.print("\n======== MQ-7 CO ========\n");
+  // Serial.print("Gas Sensor: ");  
+  // Serial.print(CO_Aout);   /*Read value printed*/
+  // Serial.print("\nGas Value: ");
+  // Serial.print(CO_gas_val);
+  // Serial.print("ppm\t");
+  // if (CO_Aout > 1200) {    /*if condition with threshold 1800*/
+  //   Serial.println("Gas");  
+  //   //digitalWrite (LED, LOW) ; /*LED set HIGH if Gas detected */
+  // }
+  // else {
+  //   Serial.println("No Gas");
+  //   //digitalWrite (LED, HIGH) ;  /*LED set LOW if NO Gas detected */
+  // }
+}
+
+void print_MQ7(void)
+{
   Serial.print("\n======== MQ-7 CO ========\n");
   Serial.print("Gas Sensor: ");  
   Serial.print(CO_Aout);   /*Read value printed*/
@@ -298,7 +392,6 @@ void read_MQ7(void) //CO Sensor
     Serial.println("No Gas");
     //digitalWrite (LED, HIGH) ;  /*LED set LOW if NO Gas detected */
   }
-  //Serial.println("========  end print  ========");
 }
 
 
@@ -307,6 +400,24 @@ void read_MQ4(void)
   met_Aout = analogRead(MQ4_input);  /*Analog value read function*/
   met_gas_val = (9800/adc_resolution)*met_Aout+200;
 
+  // Serial.print("\n======== MQ-4 METHANE ========\n");
+  // Serial.print("Gas Sensor: ");  
+  // Serial.print(met_Aout);   /*Read value printed*/
+  // Serial.print("\nGas Value: ");
+  // Serial.print(met_gas_val);
+  // Serial.print("ppm\t");
+  // if (met_Aout > 1200) {    /*if condition with threshold 1800*/
+  //   Serial.println("Gas");  
+  //   //digitalWrite (LED, LOW) ; /*LED set HIGH if Gas detected */
+  // }
+  // else {
+  //   Serial.println("No Gas");
+  //   //digitalWrite (LED, HIGH) ;  /*LED set LOW if NO Gas detected */
+  // }
+}
+
+void print_MQ4(void)
+{
   Serial.print("\n======== MQ-4 METHANE ========\n");
   Serial.print("Gas Sensor: ");  
   Serial.print(met_Aout);   /*Read value printed*/
@@ -321,7 +432,6 @@ void read_MQ4(void)
     Serial.println("No Gas");
     //digitalWrite (LED, HIGH) ;  /*LED set LOW if NO Gas detected */
   }
-  //Serial.println("========  end print  ========");
 }
 
 
@@ -329,15 +439,24 @@ void read_MIX8410(void)
 {
   o2_concentration = readConcentration();
   //float Vout =0;
+  // Serial.print("\n======== MIX8410 O2 ========\n");
+  // //Serial.print("Vout =");
+  // //Vout = readO2Vout();
+  // //Serial.print(Vout);
+  // Serial.print("O2 Concentration: ");
+  // Serial.println(o2_concentration);
+}
+
+void print_MIX8410(void)
+{
   Serial.print("\n======== MIX8410 O2 ========\n");
   //Serial.print("Vout =");
   //Vout = readO2Vout();
   //Serial.print(Vout);
   Serial.print("O2 Concentration: ");
   Serial.println(o2_concentration);
-  //Serial.println("========  end print  ========");
-}
 
+}
 
 //MIX8410 O2 Sensor Helper Func
 float readO2Vout(void)
