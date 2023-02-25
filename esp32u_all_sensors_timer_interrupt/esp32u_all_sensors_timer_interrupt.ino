@@ -26,10 +26,10 @@ SI114X SI1145 = SI114X(); // initialise sunlight sensor
 //BME280 variables and macros
 #define SEALEVELPRESSURE_HPA (1024.00)   // sea level pressure
 Adafruit_BME280 bme; // I2C
-int temp_BME;
-int pressure;
-int altitude;
-int humidity;
+float temp_BME;
+float pressure;
+float altitude;
+float humidity;
 
 
 //Light Sensor TSL2591
