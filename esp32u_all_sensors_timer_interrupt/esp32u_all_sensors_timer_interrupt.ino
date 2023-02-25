@@ -35,7 +35,7 @@ float humidity;
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 uint32_t lum;
-uint16_t ir_SI, full, visible_SI, lux;
+uint16_t ir_TSL, full, visible_TSL, lux;
 
 
 //Co2 Sensor MH-Z19
@@ -166,9 +166,9 @@ void json_data_set(void)
   doc["altitude"] = round(altitude * 100) / 100; // float
 
   doc["lum"] = lum; // uint32_t
-  doc["ir_SI"] = ir_SI; // uint16_t 
-  doc["full"] = full; // uint16_t
-  doc["visible_SI"] = visible_SI; // uint16_t
+  doc["ir_TSL"] = ir_TSL; // uint16_t 
+  //doc["full"] = full; // uint16_t
+  doc["visible_TSL"] = visible_TSL; // uint16_t
   doc["lux"] = lux; // uint16_t
 
   doc["co2_concentration"] = co2_concentration; // int
@@ -325,10 +325,10 @@ void advancedRead_TSL2591(void)
   //uint16_t ir, full;
 
   lum = tsl.getFullLuminosity();
-  ir_SI = lum >> 16;
+  ir_TSL = lum >> 16;
   full = lum & 0xFFFF;
-  visible_SI = full - ir_SI;
-  lux = tsl.calculateLux(full, ir_SI);
+  visible_TSL = full - ir_TSL;
+  lux = tsl.calculateLux(full, ir_TSL);
 
   // Serial.print("\n======== TSL2591 ========\n");
   // Serial.print(F("IR: ")); 
@@ -348,13 +348,13 @@ void print_TSL2591(void)
 {
   Serial.print("\n======== TSL2591 ========\n");
   Serial.print(F("IR: ")); 
-  Serial.print(ir_SI);  
+  Serial.print(ir_TSL);  
   Serial.print(F("  \n"));
   Serial.print(F("Full: ")); 
   Serial.print(full); 
   Serial.print(F("  \n"));
   Serial.print(F("Visible: ")); 
-  Serial.print(visible_SI); 
+  Serial.print(visible_TSL); 
   Serial.print(F("  \n"));
   Serial.print(F("Lux: ")); 
   Serial.println(lux, 6);
