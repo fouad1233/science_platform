@@ -165,7 +165,7 @@ void json_data_set(void)
   doc["pressure"] = round(pressure * 100) / 100; // float
   doc["altitude"] = round(altitude * 100) / 100; // float
 
-  doc["lum"] = lum; // uint32_t
+
   doc["ir_TSL"] = ir_TSL; // uint16_t 
   //doc["full"] = full; // uint16_t
   doc["visible_TSL"] = visible_TSL; // uint16_t
