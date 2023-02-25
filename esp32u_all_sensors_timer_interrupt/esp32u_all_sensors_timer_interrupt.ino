@@ -7,6 +7,7 @@ Other i2c sensors will be added to the same file.
 #include "Arduino.h"
 
 #include <Wire.h>
+#include <ArduinoJson.h>
 
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
@@ -34,9 +35,7 @@ int humidity;
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 uint32_t lum;
-uint16_t ir_SI, full;
-uint16_t visible_SI;
-uint16_t lux;
+uint16_t ir_SI, full, visible_SI, lux;
 
 
 //Co2 Sensor MH-Z19
@@ -57,12 +56,12 @@ int CO_Aout;
 float met_gas_val = 0;
 int met_Aout;
 
-int o2_concentration; //O2 sensor o2 concentration
 
 
 //O2 Sensor MIX8410
 const float VRefer = 3.3;       // voltage of adc reference
 const int O2_pin = 4;
+int o2_concentration; //O2 sensor o2 concentration
 
 //Functions
 void readAllSensors(void);
@@ -89,6 +88,8 @@ void print_MQ7(void);
 void print_MQ4(void);
 void print_MIX8410(void);
 
+void json_data_set(void); // JSON FUNCTION
+StaticJsonDocument<52> doc;
 
 // TIMER SETUP
 hw_timer_t *My_timer = NULL;
@@ -118,9 +119,13 @@ void loop()
 {
   if (read_sensor_flag ){
     readAllSensors();
-    printAllSensors();
+    //printAllSensors();
+    json_data_set();
+    serializeJson(doc, Serial);
+    Serial.println();
     read_sensor_flag = 0;
   }
+
   //delay(10000);
 }
 
@@ -151,6 +156,28 @@ void printAllSensors(void)
   print_MQ7();
   print_MQ4();
   print_MIX8410();
+}
+
+void json_data_set(void)
+{
+  doc["temp"] = temp_BME; // int
+  doc["humidity"] = humidity; // int
+  doc["pressure"] = pressure; // int
+  doc["altitude"] = altitude; // int
+
+  doc["lum"] = lum; // uint32_t
+  doc["ir_SI"] = ir_SI; // uint16_t 
+  doc["full"] = full; // uint16_t
+  doc["visible_SI"] = visible_SI; // uint16_t
+  doc["lux"] = lux; // uint16_t
+
+  doc["co2_concentration"] = co2_concentration; // int
+
+  doc["CO_gas_val"] = CO_gas_val; //float
+
+  doc["met_gas_val"] = met_gas_val;  //float
+
+  doc["o2_concentration"] = o2_concentration; //int
 }
 
 
