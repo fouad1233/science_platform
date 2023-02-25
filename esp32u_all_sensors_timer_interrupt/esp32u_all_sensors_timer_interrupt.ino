@@ -89,7 +89,7 @@ void print_MQ4(void);
 void print_MIX8410(void);
 
 void json_data_set(void); // JSON FUNCTION
-StaticJsonDocument<52> doc;
+StaticJsonDocument<220> doc;
 
 // TIMER SETUP
 hw_timer_t *My_timer = NULL;
