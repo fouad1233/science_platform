@@ -13,9 +13,10 @@ Other i2c sensors will be added to the same file.
 #include "Adafruit_TSL2591.h"
 
 #include "MHZ19.h"
-int read_sensor_flag;
-//UV sensor SI1145 variables
 
+uint8_t read_sensor_flag; //TIMER FLAG
+
+//UV sensor SI1145 variables
 float uv;
 float visible;
 float ir;
