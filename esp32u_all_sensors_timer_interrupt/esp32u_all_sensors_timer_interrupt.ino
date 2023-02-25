@@ -160,10 +160,10 @@ void printAllSensors(void)
 
 void json_data_set(void)
 {
-  doc["temp"] = temp_BME; // int
-  doc["humidity"] = humidity; // int
-  doc["pressure"] = pressure; // int
-  doc["altitude"] = altitude; // int
+  doc["temp"] = round(temp_BME * 100) / 100; // float
+  doc["humidity"] = round(humidity * 100) / 100; // float
+  doc["pressure"] = round(pressure * 100) / 100; // float
+  doc["altitude"] = round(altitude * 100) / 100; // float
 
   doc["lum"] = lum; // uint32_t
   doc["ir_SI"] = ir_SI; // uint16_t 
@@ -173,9 +173,9 @@ void json_data_set(void)
 
   doc["co2_concentration"] = co2_concentration; // int
 
-  doc["CO_gas_val"] = CO_gas_val; //float
+  doc["CO_gas_val"] = round(CO_gas_val * 100) / 100; //float
 
-  doc["met_gas_val"] = met_gas_val;  //float
+  doc["met_gas_val"] = round(met_gas_val * 100) / 100;  //float
 
   doc["o2_concentration"] = o2_concentration; //int
 }
