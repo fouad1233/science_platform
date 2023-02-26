@@ -27,3 +27,5 @@ This sensor is the sensor of dfrobot not adafruit so it's not work at the moment
         + Auto calibration 
         As it is mentioned inside "MH-Z19C Calibration" folder if this is set to true, the sensor will adjust it's self over a few weeks
         according to the lowest observed CO2 values each day. *You don't need to run this sketch!
+## Oxygen mixsen sensor
+- We should put a 100 ohm resistor between Gnd and Analog pin.
