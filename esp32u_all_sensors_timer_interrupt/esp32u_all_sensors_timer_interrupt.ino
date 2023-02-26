@@ -117,7 +117,8 @@ void setup()
 
 void loop()
 {
-  if (read_sensor_flag ){
+  if (read_sensor_flag)
+  {
     readAllSensors();
     //printAllSensors();
     json_data_set();
@@ -125,6 +126,8 @@ void loop()
     Serial.println();
     read_sensor_flag = 0;
   }
+  
+
 
   //delay(10000);
 }
