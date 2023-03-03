@@ -51,9 +51,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   
 }
  
-
-  
-
+ 
 //UV sensor SI1145 variables
 float uv;
 float visible;
