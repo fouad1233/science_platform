@@ -51,9 +51,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   
 }
  
-
-  
-
+ 
 //UV sensor SI1145 variables
 float uv;
 float visible;
@@ -266,9 +264,9 @@ void esp_now_data_set(void)
   myData.visible_TSL = visible_TSL; // uint16_t
   myData.lux = lux; // uint16_t
 
-  myData.uv_SI = uv;
-  myData.visible_SI = visible;
-  myData.ir_SI = ir;
+  myData.uv = uv;
+  myData.visible = visible;
+  myData.ir = ir;
 
   myData.co2_concentration = co2_concentration; // int
 
