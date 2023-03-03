@@ -126,7 +126,7 @@ void print_MQ4(void);
 void print_MIX8410(void);
 
 void json_data_set(void); // JSON FUNCTION
-StaticJsonDocument<220> doc;
+StaticJsonDocument<300> doc;
 
 // TIMER SETUP
 hw_timer_t *My_timer = NULL;
@@ -235,9 +235,9 @@ void json_data_set_esp_now(void){
   doc["pressure"] = myData.pressure; // float
   doc["altitude"] = myData.altitude; // float
 
-  doc["uv_SI"] = uv; //float
-  doc["visible_SI"] = visible; //float
-  doc["ir_SI"] = ir; //float
+  doc["uv_SI"] = myData.uv; //float
+  doc["visible_SI"] = myData.visible; //float
+  doc["ir_SI"] = myData.ir; //float
 
   doc["ir_TSL"] = myData.ir_TSL; // uint16_t 
   //doc["full"] = full; // uint16_t
@@ -265,6 +265,10 @@ void esp_now_data_set(void)
   //doc["full"] = full; // uint16_t
   myData.visible_TSL = visible_TSL; // uint16_t
   myData.lux = lux; // uint16_t
+
+  myData.uv_SI = uv;
+  myData.visible_SI = visible;
+  myData.ir_SI = ir;
 
   myData.co2_concentration = co2_concentration; // int
 
