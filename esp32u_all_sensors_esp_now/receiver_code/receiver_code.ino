@@ -235,6 +235,9 @@ void json_data_set_esp_now(void){
   doc["pressure"] = myData.pressure; // float
   doc["altitude"] = myData.altitude; // float
 
+  doc["uv_SI"] = uv; //float
+  doc["visible_SI"] = visible; //float
+  doc["ir_SI"] = ir; //float
 
   doc["ir_TSL"] = myData.ir_TSL; // uint16_t 
   //doc["full"] = full; // uint16_t

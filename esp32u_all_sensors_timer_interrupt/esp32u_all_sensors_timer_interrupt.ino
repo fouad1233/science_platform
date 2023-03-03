@@ -174,6 +174,10 @@ void json_data_set(void)
   doc["visible_TSL"] = visible_TSL; // uint16_t
   doc["lux"] = lux; // uint16_t
 
+  doc["uv_SI"] = uv; //float
+  doc["visible_SI"] = visible; //float
+  doc["ir_SI"] = ir; //float
+
   doc["co2_concentration"] = co2_concentration; // int
 
   doc["CO_gas_val"] = round(CO_gas_val * 100) / 100; //float
