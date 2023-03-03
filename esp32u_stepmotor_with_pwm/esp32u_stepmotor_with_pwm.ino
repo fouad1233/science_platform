@@ -9,7 +9,8 @@
 int freq = 624;
 const int stepChannel = 0;
 const int resolution = 8;
-int dutyCycle = 128;
+int halfDutyCycle = 128;
+int lowDutyCycle = 0;
 
 int angle = 90;
 unsigned long previousMillis = 0; 
@@ -36,21 +37,21 @@ void loop(){
   currentMillis = millis();
   if (motorFlag){
     if (currentMillis - previousMillis >= interval) {
-      ledcWrite(stepChannel, 0);
+      ledcWrite(stepChannel, lowDutycycle);
       motorFlag = false;
     }
   }
 }
 
-void IRAM_ATTR ext_INT(){
-  motorFlag = true;
+void IRAM_ATTR ext_INT(){  //When the interrupt triggered it will set the Flag true, set the previousMillis to the moment
+  motorFlag = true; 
   previousMillis = millis();
-  ledcWrite(stepChannel, 128);
+  ledcWrite(stepChannel, halfDutycycle);
 }
 
-void EXTIsetup(void){
-  pinMode(buttonPin, INPUT_PULLUP);
-  attachInterrupt(buttonPin, ext_INT, RISING);
+void EXTIsetup(void){  //Button External interrupt configurations
+  pinMode(buttonPin, INPUT_PULLUP); 
+  attachInterrupt(buttonPin, ext_INT, RISING); //
 }
 
 // void map(int angle, int direction, int stepPin, int dirPin, int pulse_time){
