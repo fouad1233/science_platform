@@ -22,7 +22,7 @@ uint8_t read_sensor_flag; //TIMER FLAG
 // MAC Address of responder - edit as required
 uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x28, 0x38};
 // Define a data structure
-typedef struct struct_message {
+typedef struct{
   float uv;
   float visible;
   float ir;

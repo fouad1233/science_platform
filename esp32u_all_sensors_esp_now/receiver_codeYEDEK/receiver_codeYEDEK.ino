@@ -21,7 +21,7 @@ Other i2c sensors will be added to the same file.
 uint8_t read_sensor_flag; //TIMER FLAG
 
 // Define a data structure
-typedef struct struct_message {
+typedef struct{
   float uv;
   float visible;
   float ir;
@@ -51,7 +51,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   
 }
  
- 
+
 //UV sensor SI1145 variables
 float uv;
 float visible;
