@@ -188,32 +188,6 @@ void readAllSensors(void) // function to read sensor values and print with Seria
   read_MIX8410(); // MIX8410 O2 Sensor
 }
 
-
-
-void esp_now_data_set(void)
-{
-  myData.temp_BME = round(temp_BME * 100) / 100; // float
-  myData.humidity = round(humidity * 100) / 100; // float
-  myData.pressure = round(pressure * 100) / 100; // float
-  myData.altitude = round(altitude * 100) / 100; // float
-
-  myData.uv = uv; //float
-  myData.visible = visible; //float
-  myData.ir = ir; //float
-
-  myData.ir_TSL = ir_TSL; // uint16_t 
-  myData.visible_TSL = visible_TSL; // uint16_t
-  myData.lux = lux; // uint16_t
-
-  myData.co2_concentration = co2_concentration; // int
-
-  myData.CO_gas_val = round(CO_gas_val * 100) / 100; //float
-
-  myData.met_gas_val = round(met_gas_val * 100) / 100;  //float
-
-  myData.o2_concentration = o2_concentration; //int
-}
-
 ///////////SETUP FUNCTIONS///////////
 void SI1145_setup(void)
 {
@@ -227,7 +201,7 @@ void SI1145_setup(void)
 
 void BME280_setup(void)
 {
-  while(!Serial);    // time to get serial running
+  while(!Serial);    // time to get Serial running
   Serial.println(F("BME280 test"));
 
   unsigned status;
