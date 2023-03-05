@@ -18,7 +18,7 @@ Other i2c sensors will be added to the same file.
 
 uint8_t read_sensor_flag; //TIMER FLAG
 // MAC Address of responder - edit as required
-uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x28, 0x38};
+uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x28, 0x38}; //40:91:51:AC:28:38
 
 // Define a data structure
 typedef struct{
@@ -227,38 +227,13 @@ void readAllSensors(void) // function to read sensor values and print with Seria
 }
 
 
-
-void esp_now_data_set(void)
-{
-  myData.temp_BME = round(temp_BME * 100) / 100; // float
-  myData.humidity = round(humidity * 100) / 100; // float
-  myData.pressure = round(pressure * 100) / 100; // float
-  myData.altitude = round(altitude * 100) / 100; // float
-
-  myData.uv = uv; //float
-  myData.visible = visible; //float
-  myData.ir = ir; //float
-
-  myData.ir_TSL = ir_TSL; // uint16_t 
-  myData.visible_TSL = visible_TSL; // uint16_t
-  myData.lux = lux; // uint16_t
-
-  myData.co2_concentration = co2_concentration; // int
-
-  myData.CO_gas_val = round(CO_gas_val * 100) / 100; //float
-
-  myData.met_gas_val = round(met_gas_val * 100) / 100;  //float
-
-  myData.o2_concentration = o2_concentration; //int
-}
-
 void stepmotor_setup(void){
   //Stepmotor setup
   pinMode(dirPin,OUTPUT);
   ledcSetup(stepChannel, freq, resolution);
   // attach the channel to the GPIO to be controlled
   ledcAttachPin(stepPin, stepChannel);
-  digitalWrite(dirPin,HIGH);
+  digitalWrite(dirPin,HIGH); // Setting direction to clockwise
 }
 
 

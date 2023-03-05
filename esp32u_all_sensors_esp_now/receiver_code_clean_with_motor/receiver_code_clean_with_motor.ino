@@ -11,6 +11,8 @@ This file is used to get sensor values from esp now and transmit it with serial
 
 
 uint8_t read_sensor_flag; //TIMER FLAG
+// MAC Address of responder - edit as required
+uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x25, 0x1C}; //40:91:51:AC:25:1C
 
 // Define a data structure
 typedef struct{
@@ -36,7 +38,7 @@ typedef struct{
 }struct_motor_message;
 
 // Create a structured object
-struct_message myData;
+struct_receive_message myData;
 struct_motor_message motorData;
 
 
@@ -107,6 +109,18 @@ void loop()
     json_data_set_esp_now();
     serializeJson(doc, Serial);
     Serial.println();
+
+    // Send message via ESP-NOW
+    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &motorData, sizeof(motorData));
+
+    // Serial.println();
+    // if (result == ESP_OK) {
+    //   Serial.println("Sending confirmed");
+    // }
+    // else {
+    //   Serial.println("Sending error");
+    // }
+    
     read_sensor_flag = 0;
   }
 }
