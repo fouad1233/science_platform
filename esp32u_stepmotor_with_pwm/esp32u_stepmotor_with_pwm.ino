@@ -3,7 +3,7 @@
 #define dirPin 12 
 
 #define buttonPin 16
-
+#define proximityPin 2
 
 // setting PWM properties
 int freq = 624;
@@ -15,52 +15,52 @@ int lowDutyCycle = 0;
 int angle = 90;
 unsigned long previousMillis = 0; 
 unsigned long currentMillis;
-long interval = (57*200*angle*1000)/(11*360*freq);  // interval at which to blink (miliseconds)
-int stepState = LOW;
+long interval = (57*200*angle*1000)/(11*360*freq);  // interval at which to stop PWM (miliseconds)
 bool motorFlag = false;
 
-void EXTIsetup(void);
 
 void setup(){
-  EXTIsetup(); //Configure external interrupt of button
+  buttonSetup(); //Configure external interrupt of button
   /*PWM Setup*/
   pinMode(dirPin,OUTPUT);
   ledcSetup(stepChannel, freq, resolution);
   // attach the channel to the GPIO to be controlled
   ledcAttachPin(stepPin, stepChannel);
-  //Button Setup
   digitalWrite(dirPin,HIGH);
-  //ledcWrite(stepChannel, dutyCycle);
+  //proximitySetup(); //Set the proximity sensor interruption and start the step motor rotation automatically
 }
 
 void loop(){
-  currentMillis = millis();
   if (motorFlag){
+    currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
-      ledcWrite(stepChannel, lowDutycycle);
+      ledcWrite(stepChannel, lowDutyCycle);
       motorFlag = false;
     }
   }
 }
 
-void IRAM_ATTR ext_INT(){  //When the interrupt triggered it will set the Flag true, set the previousMillis to the moment
+void IRAM_ATTR button_INT(){  //When the interrupt triggered it will set the Flag true, set the previousMillis to the moment
   motorFlag = true; 
   previousMillis = millis();
-  ledcWrite(stepChannel, halfDutycycle);
+  ledcWrite(stepChannel, halfDutyCycle);
 }
 
-void EXTIsetup(void){  //Button External interrupt configurations
+void buttonSetup(void){  //Button External interrupt configurations
   pinMode(buttonPin, INPUT_PULLUP); 
-  attachInterrupt(buttonPin, ext_INT, RISING); //
+  attachInterrupt(buttonPin, button_INT, RISING); 
 }
 
-// void map(int angle, int direction, int stepPin, int dirPin, int pulse_time){
-//   digitalWrite(dirPin,direction);
-//   for(int x = 0; x < (int)((57*200*angle)/(11*360)); x++) {
-//     digitalWrite(stepPin,HIGH); 
-//     delayMicroseconds(pulse_time); 
-//     digitalWrite(stepPin,LOW); 
-//     delayMicroseconds(pulse_time); 
-//   }
-//   delay(500);
+
+// void IRAM_ATTR proximity_INT(){
+//   ledcWrite(stepChannel, lowDutyCycle);
+//   motorFlag = false;
+//   detachInterrupt(proximityPin, proximity_INT, RISING);
 // }
+
+// void proximitySetup(void){
+//   pinMode(proximityPin, INPUT_PULLUP);
+//   attachInterrupt(proximityPin, proximity_INT, RISING);
+//   ledcWrite(stepChannel, haldDutyCycle);
+// }
+
