@@ -6,7 +6,7 @@
 #define proximityPin 2
 
 // setting PWM properties
-int freq = 624;
+int freq = 624/2;
 const int stepChannel = 0;
 const int resolution = 8;
 int halfDutyCycle = 128;
@@ -18,15 +18,19 @@ unsigned long currentMillis;
 long interval = (57*200*angle*1000)/(11*360*freq);  // interval at which to stop PWM (miliseconds)
 bool motorFlag = false;
 
+unsigned long lastPressed=0;
+unsigned long currentPressed=0;
+
 
 void setup(){
   buttonSetup(); //Configure external interrupt of button
+  Serial.begin(115200);
   /*PWM Setup*/
   pinMode(dirPin,OUTPUT);
   ledcSetup(stepChannel, freq, resolution);
   // attach the channel to the GPIO to be controlled
   ledcAttachPin(stepPin, stepChannel);
-  digitalWrite(dirPin,HIGH);
+  digitalWrite(dirPin,LOW);
   //proximitySetup(); //Set the proximity sensor interruption and start the step motor rotation automatically
 }
 
@@ -41,9 +45,14 @@ void loop(){
 }
 
 void IRAM_ATTR button_INT(){  //When the interrupt triggered it will set the Flag true, set the previousMillis to the moment
-  motorFlag = true; 
-  previousMillis = millis();
-  ledcWrite(stepChannel, halfDutyCycle);
+  currentPressed = millis();
+  if (currentPressed-lastPressed>=1000){
+    motorFlag = true; 
+    previousMillis = millis();
+    ledcWrite(stepChannel, halfDutyCycle);
+    Serial.println("ON");
+    lastPressed = currentPressed;
+  }
 }
 
 void buttonSetup(void){  //Button External interrupt configurations

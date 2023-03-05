@@ -60,7 +60,7 @@ int met_Aout;
 
 //O2 Sensor MIX8410
 const float VRefer = 3.3;       // voltage of adc reference
-const int O2_pin = 4;
+const int O2_pin = 13;
 int o2_concentration; //O2 sensor o2 concentration
 
 //Functions
