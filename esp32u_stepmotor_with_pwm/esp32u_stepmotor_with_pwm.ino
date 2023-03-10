@@ -45,13 +45,13 @@ void loop(){
 }
 
 void IRAM_ATTR button_INT(){  //When the interrupt triggered it will set the Flag true, set the previousMillis to the moment
-  currentPressed = millis();
-  if (currentPressed-lastPressed>=1000){
+  //currentPressed = millis();
+  if (!motorFlag){   //currentPressed-lastPressed>=1000
     motorFlag = true; 
     previousMillis = millis();
     ledcWrite(stepChannel, halfDutyCycle);
     Serial.println("ON");
-    lastPressed = currentPressed;
+    //lastPressed = currentPressed;
   }
 }
 
