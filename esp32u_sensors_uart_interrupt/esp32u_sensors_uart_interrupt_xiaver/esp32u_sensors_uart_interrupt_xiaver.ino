@@ -109,6 +109,7 @@ void setup()
   }
   // Register the send callback
   esp_now_register_send_cb(OnDataSent);
+  motorData.motorFlag = 0;
 
   // Register peer
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
