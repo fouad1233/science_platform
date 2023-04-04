@@ -61,6 +61,16 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&motorData, incomingData, sizeof(motorData));
 }
 
+//Received interrupt call back function
+void UART_RX_IRQ() {
+  uint16_t size = Serial.available();
+  Serial.printf("Got %d bytes on Serial to read\n", size);
+  while(Serial.available())  {
+    Serial.write(Serial.read());
+  }
+  Serial.printf("\nSerial data processed!\n");
+}
+
 //UV sensor SI1145
 SI114X SI1145 = SI114X(); // initialise sunlight sensor
 
@@ -141,6 +151,7 @@ void IRAM_ATTR onTimer()
 void setup()
 {
   Serial.begin(115200);
+  Serial.onReceive(UART_RX_IRQ);
   // Set ESP32 as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
