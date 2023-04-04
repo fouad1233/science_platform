@@ -24,5 +24,8 @@ void setup() {
 }
  
 void loop() {
+  Serial.print("MAC Address: ");
+  Serial.println(WiFi.macAddress());
+  delay(500);
  
 }
