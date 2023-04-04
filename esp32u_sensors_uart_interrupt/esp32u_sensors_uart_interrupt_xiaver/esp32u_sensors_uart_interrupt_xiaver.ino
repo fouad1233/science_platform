@@ -58,11 +58,29 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 // Callback function uart interrupt
 void UART_RX_IRQ() {
   uint16_t size = Serial.available();
-  Serial.printf("Got %d bytes on Serial to read\n", size);
-  while(Serial.available())  {
-    Serial.write(Serial.read());
-  }
-  Serial.printf("\nSerial data processed!\n");
+  //Serial.printf("Got %d bytes on Serial to read\n", size);
+  // Read the incoming data
+  String json_str = Serial.readString();
+  // Declare a JSON document object
+  StaticJsonDocument<200> xiaver;
+  // Decode the JSON string into the document object
+  DeserializationError err = deserializeJson(xiaver, json_str);
+  // Check if decoding was successful
+    if (err == DeserializationError::Ok) {
+      // Get the values of the fields in the document
+      motorData.motorFlag = xiaver["Motor Flag"];
+      motorData.tube_to_go = xiaver["tube_to_go"];
+      
+
+    } else {
+      // Print an error message
+      Serial.print("JSON decoding failed: ");
+      Serial.println(err.c_str());
+    }
+  //while(Serial.available())  {
+    //Serial.write(Serial.read());
+  //}
+  //Serial.printf("\nSerial data processed!\n");
 }
 
 void json_data_set(void); // JSON FUNCTION

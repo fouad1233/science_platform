@@ -202,6 +202,7 @@ void loop()
   if (motorData.motorFlag){
     currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
+      Serial.println("motorFlag");
       ledcWrite(stepChannel, lowDutyCycle);
       motorData.motorFlag = false;
     }
