@@ -109,7 +109,7 @@ void setup()
   }
   // Register the send callback
   esp_now_register_send_cb(OnDataSent);
-  motorData.motorFlag = 0;
+  
 
   // Register peer
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
@@ -142,7 +142,7 @@ void loop()
 
     // Send message via ESP-NOW
     esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &motorData, sizeof(motorData));
-
+    motorData.motorFlag = 0;
     // Serial.println();
     // if (result == ESP_OK) {
     //   Serial.println("Sending confirmed");
