@@ -22,7 +22,7 @@ Other i2c sensors will be added to the same file.
 #define RELAY3 12
 #define RELAY4 25        //pump
 #define pumpPin 4
-#define pumpChannel 0
+#define pumpChannel 1
 void valve_pump_setup(void);
 
 int pumpFreq = 425;
@@ -129,10 +129,13 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  
   memcpy(&motorData, incomingData, sizeof(motorData));
   if (motorData.motorFlag && motorData.tube_to_go!=current_tube)
   {
     interval = angles.getInterval(motorData.tube_to_go);
+    ledcWrite(stepChannel, halfDutyCycle);
+
   }
 
   
@@ -152,6 +155,15 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     pwmpumpState = 1;
   }
 
+  Serial.print("motor Flag ");
+  Serial.println(motorData.motorFlag);
+  Serial.println("Tube to go ");
+  Serial.println(motorData.tube_to_go);
+  Serial.println("received states");
+  for(int i=0;i<=4;i++)
+  {
+    Serial.println(motorData.received_states[i]);
+  }
 }
 
 //UV sensor SI1145

@@ -78,7 +78,7 @@ void UART_RX_IRQ() {
 
       for(int i=0;i<=4;i++)
       {
-        motorData.received_states[i] = xiaver["received_states"];
+        motorData.received_states[i] = xiaver["received_states"][i];
       }
 
     } else {
