@@ -33,7 +33,7 @@ typedef struct{
 } struct_receive_message;
 
 typedef struct{
-  bool motorFlag = false;
+  int motorFlag = 0;
   int tube_to_go = 1;
 }struct_motor_message;
 
@@ -68,9 +68,8 @@ void UART_RX_IRQ() {
   // Check if decoding was successful
     if (err == DeserializationError::Ok) {
       // Get the values of the fields in the document
-      motorData.motorFlag = xiaver["Motor Flag"];
+      motorData.motorFlag = xiaver["motorFlag"];
       motorData.tube_to_go = xiaver["tube_to_go"];
-      
 
     } else {
       // Print an error message

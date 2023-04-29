@@ -18,8 +18,8 @@ Other i2c sensors will be added to the same file.
 
 
 //StepMotor Definings
-#define stepPin 14 
-#define dirPin 12 
+#define stepPin 2
+#define dirPin 15
 int freq = 624;
 const int stepChannel = 0;
 const int resolution = 8;
@@ -94,7 +94,7 @@ typedef struct{
 } struct_send_message;
 
 typedef struct{
-  bool motorFlag = false;
+  int motorFlag = 0;
   int tube_to_go = 1;
 }struct_motor_message;
 
@@ -142,15 +142,15 @@ MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
 
 //CO Sensor MQ7 and CH4 Sensor MQ4
 int adc_resolution = 4095;
-#define MQ7_input 27    /*Digital pin 5 for sensor input*/
+#define MQ7_input 33   /*Digital pin 5 for sensor input*/
 int CO_Aout;
-#define MQ4_input 33
+#define MQ4_input 26
 int met_Aout;
 
 
 //O2 Sensor MIX8410
+#define O2_pin 13
 const float VRefer = 3.3; // voltage of adc reference
-const int O2_pin = 4;
 float MeasuredVout;
 float Concentration;
 float Concentration_Percentage;
