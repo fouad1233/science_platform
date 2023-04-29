@@ -25,8 +25,8 @@ Other i2c sensors will be added to the same file.
 #define pumpChannel 0
 void valve_pump_setup(void);
 
-int freq = 425;
-const int resolution = 8;
+int pumpFreq = 425;
+const int pumpResolution = 8;
 int pumpDutyCycle = 256*14/100;
 int pwmpumpState = 0;
 //int current_states[] = {1,1,1,1};
@@ -34,15 +34,15 @@ int pwmpumpState = 0;
 //StepMotor Definings
 #define stepPin 2
 #define dirPin 15 
-int freq = 624;
+int motorFreq = 624;
 const int stepChannel = 0;
-const int resolution = 8;
+const int motorResolution = 8;
 int halfDutyCycle = 128;
 int lowDutyCycle = 0;
 int angle = 90;
 unsigned long previousMillis = 0; 
 unsigned long currentMillis;
-const long constInterval = (57*200*angle*1000)/(11*360*freq);  // interval at which to stop PWM (miliseconds)
+const long constInterval = (57*200*angle*1000)/(11*360*motorFreq);  // interval at which to stop PWM (miliseconds)
 long interval  = constInterval;
 int current_tube = 1; //1 2 3 4 positions
 
@@ -110,7 +110,7 @@ typedef struct{
 typedef struct{
   int motorFlag = 0;
   int tube_to_go = 1;
-  int received_states[] = {1,1,1,1,0};  // 0,1,2,3 indexler->RELAY 1,2,3,4(pump) 4.index pump(pwm) 
+  int received_states[5] = {1,1,1,1,0};  // 0,1,2,3 indexler->RELAY 1,2,3,4(pump) 4.index pump(pwm) 
 
 }struct_motor_message;
 
@@ -142,10 +142,10 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   digitalWrite(RELAY4,motorData.received_states[3]);
 
   if (pwmpumpState && !motorData.received_states[4])
-  [
+  {
     ledcWrite(pumpChannel, 0);
     pwmpumpState = 0;
-  ]
+  }
   else if(!pwmpumpState && motorData.received_states[4])
   {
     ledcWrite(pumpChannel, pumpDutyCycle);
@@ -315,7 +315,7 @@ void valve_pump_setup(void){
   digitalWrite(RELAY2 ,HIGH);
   digitalWrite(RELAY3 ,HIGH);
 
-  ledcSetup(pumpChannel, freq, resolution);
+  ledcSetup(pumpChannel, pumpFreq, pumpResolution);
   ledcAttachPin(pumpPin, pumpChannel);
   ledcWrite(pumpChannel, pumpDutyCycle);
 }
@@ -323,7 +323,7 @@ void valve_pump_setup(void){
 void stepmotor_setup(void){
   //Stepmotor setup
   pinMode(dirPin,OUTPUT);
-  ledcSetup(stepChannel, freq, resolution);
+  ledcSetup(stepChannel, motorFreq, motorResolution);
   // attach the channel to the GPIO to be controlled
   ledcAttachPin(stepPin, stepChannel);
   digitalWrite(dirPin,HIGH); // Setting direction to clockwise

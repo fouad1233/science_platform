@@ -35,7 +35,7 @@ typedef struct{
 typedef struct{
   int motorFlag = 0;
   int tube_to_go = 1;
-  int received_states[] = {1,1,1,1,0};  // 0,1,2,3 indexler->RELAY 1,2,3,4(pump) 4.index pump(pwm) 
+  int received_states[5] = {1,1,1,1,0};  // 0,1,2,3 indexler->RELAY 1,2,3,4(pump) 4.index pump(pwm) 
   //msg dosyasına değişkenleri ekle
   
 }struct_motor_message;
@@ -73,7 +73,13 @@ void UART_RX_IRQ() {
       // Get the values of the fields in the document
       motorData.motorFlag = xiaver["motorFlag"];
       motorData.tube_to_go = xiaver["tube_to_go"];
-      motorData.received_states = xiaver["received_states"]
+      //motorData.received_states =
+      //memcpy(motorData.received_states, xiaver["received_status"], 5*sizeof(int));
+
+      for(int i=0;i<=4;i++)
+      {
+        motorData.received_states[i] = xiaver["received_states"];
+      }
 
     } else {
       // Print an error message
