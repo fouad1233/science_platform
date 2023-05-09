@@ -11,7 +11,8 @@
   please support Adafruit andopen-source hardware by purchasing products
   from Adafruit!
 
-  Written by Limor Fried & Kevin Townsend  uded in any redistribution
+  Written by Limor Fried & Kevin Townsend for Adafruit Industries.
+  BSD license, all text above must be included in any redistribution
   See the LICENSE file for details.
  ***************************************************************************/
 
