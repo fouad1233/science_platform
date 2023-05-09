@@ -232,12 +232,12 @@ MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
 int adc_resolution = 4095;
 #define MQ7_input 33    /*Digital pin 5 for sensor input*/
 int CO_Aout;
-#define MQ4_input 26
+#define MQ4_input 35
 int met_Aout;
 
 
 //O2 Sensor MIX8410
-#define O2_pin 13
+#define O2_pin 32
 const float VRefer = 3.3; // voltage of adc reference
 float MeasuredVout;
 float Concentration;
