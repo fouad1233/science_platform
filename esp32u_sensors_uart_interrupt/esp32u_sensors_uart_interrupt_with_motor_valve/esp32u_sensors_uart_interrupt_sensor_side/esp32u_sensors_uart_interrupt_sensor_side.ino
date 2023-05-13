@@ -11,13 +11,12 @@
 #include "MHZ19.h"
 
 
-/*FOR DEBUG PURPOSES USE debug(x) for Serial.print(x) and debugln(x) form Serial.println(x) 
-ACTIVATE IT BY SETTING DEBUG TO 1*/
+/*
+FOR DEBUG PURPOSES USE debug(x) for Serial.print(x) and debugln(x) form Serial.println(x) 
+ACTIVATE IT BY SETTING DEBUG TO 1
+*/
 
-//44456
-//780185
-
-#define DEBUG 1
+#define DEBUG 0
 
 #if DEBUG == 1    
 #define debug(x) Serial.print(x)
@@ -35,8 +34,8 @@ ACTIVATE IT BY SETTING DEBUG TO 1*/
 #define RELAY3 12
 #define RELAY4 25        //pump
 */
-//int relay[4] = {27,14,12,25};  //RELAY1 RELAY2 RELAY3 RELAY4(pump)
-int relay[4] = {12,14,27,25};
+
+int relay[4] = {12,14,27,25}; //RELAY1 RELAY2 RELAY3 RELAY4(pump)
 
 /*PWM PUMP PINS AND VARIABLES*/
 #define pumpPin 4
@@ -99,7 +98,7 @@ long adjacency::getInterval(int tube_to_go)
     digitalWrite(dirPin,HIGH);   //TERSİ OLABİLİR KONTROL ET  
   }
 
-  return abs(length)*constInterval;
+  return (long)(abs((float)length)*(float)constInterval*1.5);
 }
 adjacency angles;
 
@@ -159,10 +158,22 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   set direction to turn, start the pwm, set the current tube to tube_to_go and set the motorflag to 1*/
   if (motorData.tube_to_go!=current_tube)
   {
+    
     interval = angles.getInterval(motorData.tube_to_go);
+
+    debugln();
+    debugln("interval");
+    debugln(interval);
+    debugln("current_tube");
+    debugln(current_tube);
+    debugln("Tube to go ");
+    debugln(motorData.tube_to_go);
+
     ledcWrite(stepChannel, halfDutyCycle);
     current_tube = motorData.tube_to_go;
+    previousMillis = millis();
     motorFlag = 1;
+    
   }
 
 
@@ -184,12 +195,7 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   }
 
 
-  //Disable printing debug lines by setting DEBUG to 0 at the beginning of code
-  debug("Tube to go ");
-  debugln(motorData.tube_to_go);
   debugln("received states");
-  
-
   //Iterating over relay pins and received relay states. Set what the received relay states says
   for(int i=0;i<4;i++)
   {
@@ -203,7 +209,6 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   digitalWrite(RELAY3,motorData.received_states[2]);
   digitalWrite(RELAY4,motorData.received_states[3]);
   */
-
 }
 
 
@@ -275,7 +280,7 @@ void print_MIX8410(void);
 hw_timer_t *My_timer = NULL;
 void IRAM_ATTR onTimer()
 {
-  read_sensor_flag = 1; /*SET "read_sensor_flag" TO 1 ON TIMER INTERRUPT*/
+  read_sensor_flag = 1; //SET "read_sensor_flag" TO 1 ON TIMER INTERRUPT
 }
 
 void setup()
@@ -327,11 +332,11 @@ void setup()
 
 void loop()
 {
-  //debugln("loopun icinde");
+  //If the sensor flag is 1 and motor is not turning, it reads al the sensors at once and sends them to xaiver side esp32.
+  //After finishing all the tasks set read_sensor_flag to 0
+  //Sensors will not be read and sensor data will not be sent to xavier side
 
-  /* If the sensor flag is 1 it reads al the sensors at once and sends them to xaiver side esp32.
-  After finishing all the tasks set read_sensor_flag to 0*/
-  if (read_sensor_flag ){
+  if (read_sensor_flag && !motorFlag){
     readAllSensors();
 
     // Send message via ESP-NOW
@@ -355,11 +360,19 @@ void loop()
   if (motorFlag){
 
     currentMillis = millis();
+    
     if (currentMillis - previousMillis >= interval) {
-      debugln("motorFlag");
       ledcWrite(stepChannel, lowDutyCycle);
-      motorFlag = 0;
+      motorFlag = 0; 
+      debugln();
+      debugln("current");
+      debugln(currentMillis);  
+      debugln("previous");
+      debugln(previousMillis); 
+      debugln("fark");
+      debugln(currentMillis - previousMillis);
     }
+
   }
 }
 
@@ -479,8 +492,6 @@ void mhz19_setup(void)
   mhz19_uart->setAutoCalibration(true); //AUTO CALIBRATION// IN ORDER TO AUTOCALIBRATE SET setAutoCalibration(true) and calibrateSpan(5000)
   mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
   mhz19_uart->calibrateSpan(5000);
-
-  //delay(3000); // Issue #14 //
 }
 
 
