@@ -35,8 +35,8 @@ ACTIVATE IT BY SETTING DEBUG TO 1*/
 #define RELAY3 12
 #define RELAY4 25        //pump
 */
-int relay[4] = {27,14,12,25};  //RELAY1 RELAY2 RELAY3 RELAY4(pump)
-
+//int relay[4] = {27,14,12,25};  //RELAY1 RELAY2 RELAY3 RELAY4(pump)
+int relay[4] = {12,14,27,25};
 
 /*PWM PUMP PINS AND VARIABLES*/
 #define pumpPin 4
@@ -347,7 +347,7 @@ void loop()
 
     read_sensor_flag = 0; //Set to 0 after reading and sending all sensor data
 
-    printAllSensors();
+    //printAllSensors();
   }
 
   /*If motorFlag is set to 1 it immediately starts to check if enough time("interval" variable) has been passed to turn the step motor rotation off
@@ -421,13 +421,13 @@ void stepmotor_setup(void){
 //Removed the while loop to prevent waiting at start if the sensor is not connected
 void SI1145_setup(void)
 {
-  
+  /*
   while (!SI1145.Begin()) //?????????????
   {
     debugln("Si1145 is not ready!");
     delay(1000);
   }
-  
+  */
 }
 
 
@@ -443,7 +443,7 @@ void BME280_setup(void)
   status = bme.begin(0x76);  
   if (!status) {
       debugln("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-      while (1) delay(10);  //???????????????
+      //while (1) delay(10);  //???????????????
   }
 }
 
@@ -461,7 +461,7 @@ void TSL2591_setup(void)
   else 
   {
     debugln(F("No sensor found ... check your wiring?"));
-    while (1);  //??????????????
+    //while (1);  //??????????????
   }
   //////configure the sensor
   tsl.setGain(TSL2591_GAIN_MED);      // 25x gain
