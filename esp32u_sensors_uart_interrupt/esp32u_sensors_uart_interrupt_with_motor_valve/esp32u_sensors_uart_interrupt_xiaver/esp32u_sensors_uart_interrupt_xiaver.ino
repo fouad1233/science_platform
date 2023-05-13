@@ -136,7 +136,7 @@ void setup()
   //Timer Configurations
   My_timer = timerBegin(0, 80, true);
   timerAttachInterrupt(My_timer, &onTimer, true);
-  timerAlarmWrite(My_timer, 1000000, true);
+  timerAlarmWrite(My_timer, 1000000/2, true);  //Updated 1 second to 500 ms
   timerAlarmEnable(My_timer); //Just Enable
 }
 
