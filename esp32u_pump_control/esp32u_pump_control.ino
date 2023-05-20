@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <string.h>
-#define pumpPin 4
+#define pumpPin 25
 #define pumpChannel 0
-int freq = 425;
+int freq = 50;//425
 const int resolution = 8;
 int pumpDutyCycle = 256*14/100;
 int input;
@@ -11,10 +11,10 @@ void setup() {
   Serial.begin(115200);
   ledcSetup(pumpChannel, freq, resolution);
   ledcAttachPin(pumpPin, pumpChannel);
-  ledcWrite(pumpChannel, pumpDutyCycle);
 }
 
 void loop() {
+  /*
   if(Serial.available()){
     input = Serial.parseInt();
     if (input){
@@ -25,7 +25,7 @@ void loop() {
       Serial.print(freq);      
       Serial.println();
     }
-    
+    */
 
     // input = Serial.parseInt();
     // if (input){
@@ -36,5 +36,4 @@ void loop() {
     //   Serial.print(pumpDutyCycle);
     //   Serial.println();
     // }
-  }
 }

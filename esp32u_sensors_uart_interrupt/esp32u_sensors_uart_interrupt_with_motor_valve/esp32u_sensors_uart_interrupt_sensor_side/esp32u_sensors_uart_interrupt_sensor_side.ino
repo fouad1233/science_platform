@@ -7,7 +7,7 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_TSL2591.h"
-#include "Adafruit_TCS34725.h"
+//#include "Adafruit_TCS34725.h"
 
 //#include "SI114X.h"
 //#include "MHZ19.h"
@@ -262,8 +262,8 @@ Adafruit_BME280 bme;
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 
 //Color Sensor TCS34725
-Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X);
-
+//Adafruit_TCS34725 tcs = Adafruit_TCS34725();
+//TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X
 
 
 //CO Sensor MQ7 and CH4 Sensor MQ4
@@ -322,7 +322,7 @@ void setup()
   //running sensor setups
   BME280_setup();
   TSL2591_setup();
-  TCS34725_setup();
+  //TCS34725_setup();
   stepmotor_setup();
   valve_pump_setup();
   //SI1145_setup();
@@ -386,7 +386,7 @@ void readAllSensors(void) // function to read sensor values and print with Seria
 
   read_TSL2591(); // light sensor
 
-  read_TCS34725(); // Color sensor
+  //read_TCS34725(); // Color sensor
 
   read_MQ7(); // MQ7 CO Sensor
 
@@ -477,14 +477,14 @@ void TSL2591_setup(void)
 
 void TCS34725_setup(void)
 {
-
+/*
   if (tcs.begin()) {
     Serial.println("Found sensor");
   } else {
     Serial.println("No TCS34725 found ... check your connections");
     //while (1);
   }
-
+*/
 }
 
 void SI1145_setup(void)
@@ -537,11 +537,12 @@ void read_TSL2591(void)
 
 
 void read_TCS34725(void){
+/*
   tcs.getRawData(&myData.r, &myData.g, &myData.b, &myData.c);
   // colorTemp = tcs.calculateColorTemperature(r, g, b);
   myData.colorTemp = tcs.calculateColorTemperature_dn40(myData.r, myData.g, myData.b, myData.c);
   //lux = tcs.calculateLux(r, g, b);
-
+*/
 }
 
 
@@ -618,7 +619,7 @@ void printAllSensors(void)
 {
   print_BME280();
   print_TSL2591();
-  print_TCS34725();
+  //print_TCS34725();
   print_MQ7();
   print_MQ4();
   print_MIX8410();
@@ -664,13 +665,14 @@ void print_TSL2591(void)
 }
 
 void print_TCS34725(void){
+/*
   Serial.print("Color Temp: "); Serial.print(myData.colorTemp, DEC); Serial.print(" K - ");
   Serial.print("R: "); Serial.print(myData.r, DEC); Serial.print(" ");
   Serial.print("G: "); Serial.print(myData.g, DEC); Serial.print(" ");
   Serial.print("B: "); Serial.print(myData.b, DEC); Serial.print(" ");
   Serial.print("C: "); Serial.print(myData.c, DEC); Serial.print(" ");
   Serial.println(" ");
-
+*/
 }
 
 
