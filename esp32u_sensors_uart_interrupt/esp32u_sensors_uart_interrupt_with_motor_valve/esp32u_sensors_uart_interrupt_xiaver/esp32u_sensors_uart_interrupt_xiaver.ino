@@ -9,6 +9,14 @@ This file is used to get sensor values from esp now and transmit it with serial
 
 #include <ArduinoJson.h>
 
+#include <Wire.h>
+#include "Arduino.h"
+
+#include <Adafruit_BME280.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_TSL2591.h"
+#include "Adafruit_TCS34725.h"
+
 // TIMER SETUP
 uint8_t read_sensor_flag; //TIMER FLAG
 hw_timer_t *My_timer = NULL;
@@ -22,7 +30,8 @@ void IRAM_ATTR onTimer()
 // MAC Address of responder - edit as required
 uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x2D, 0xCC}; //40:91:51:AC:2D:CC
 
-
+//Color Sensor TCS34725
+Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X);
 // Define a data structure
 typedef struct{
   
@@ -39,7 +48,7 @@ typedef struct{
   float met_gas_val;
   int o2_concentration;
 
-  uint16_t r, g, b, c, colorTemp; //Color sensor
+  //uint16_t r, g, b, c, colorTemp; //Color sensor
 
   /*
   float uv;
@@ -51,6 +60,9 @@ typedef struct{
   */
   
 } struct_receive_message;
+typedef struct{
+  uint16_t r, g, b, c, colorTemp;
+} struct_color_sensor;
 
 typedef struct{
   int motorFlag = 0;
@@ -62,6 +74,8 @@ typedef struct{
 // Create a structured object
 struct_receive_message myData;
 struct_motor_message motorData;
+struct_color_sensor colorSensor;
+
 
 
 
@@ -152,6 +166,8 @@ void setup()
   timerAttachInterrupt(My_timer, &onTimer, true);
   timerAlarmWrite(My_timer, 1000000/2, true);  //Updated 1 second to 500 ms
   timerAlarmEnable(My_timer); //Just Enable
+  //sensor begin 
+  TCS34725_setup();
 }
 
 
@@ -173,11 +189,40 @@ void loop()
     // else {
     //   Serial.println("Sending error");
     // }
+    read_TCS34725();
     
     read_sensor_flag = 0;
   }
 }
 
+void TCS34725_setup(void)
+{
+
+  if (tcs.begin()) {
+    Serial.println("Found sensor");
+  } else {
+    Serial.println("No TCS34725 found ... check your connections");
+    //while (1);
+  }
+
+}
+void read_TCS34725(void){
+  tcs.getRawData(&colorSensor.r, &colorSensor.g, &colorSensor.b, &colorSensor.c);
+  // colorTemp = tcs.calculateColorTemperature(r, g, b);
+  colorSensor.colorTemp = tcs.calculateColorTemperature_dn40(colorSensor.r, colorSensor.g, colorSensor.b, colorSensor.c);
+  //lux = tcs.calculateLux(r, g, b);
+
+}
+
+void print_TCS34725(void){
+  Serial.print("Color Temp: "); Serial.print(colorSensor.colorTemp, DEC); Serial.print(" K - ");
+  Serial.print("R: "); Serial.print(colorSensor.r, DEC); Serial.print(" ");
+  Serial.print("G: "); Serial.print(colorSensor.g, DEC); Serial.print(" ");
+  Serial.print("B: "); Serial.print(colorSensor.b, DEC); Serial.print(" ");
+  Serial.print("C: "); Serial.print(colorSensor.c, DEC); Serial.print(" ");
+  Serial.println(" ");
+
+}
 
 void json_data_set_esp_now(void){
   doc["temp"] = myData.temp_BME; // float
@@ -198,11 +243,11 @@ void json_data_set_esp_now(void){
 
   doc["o2_concentration"] = myData.o2_concentration; //int
 
-  doc["red"] = myData.r;
-  doc["green"] = myData.g;
-  doc["blue"] = myData.b;
-  doc["c"] = myData.c;
-  doc["color_temp"] = myData.colorTemp;
+  doc["red"] = colorSensor.r;
+  doc["green"] = colorSensor.g;
+  doc["blue"] = colorSensor.b;
+  doc["c"] = colorSensor.c;
+  doc["color_temp"] = colorSensor.colorTemp;
 
 
 
