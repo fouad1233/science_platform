@@ -7,10 +7,6 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_TSL2591.h"
-//#include "Adafruit_TCS34725.h"
-
-//#include "SI114X.h"
-//#include "MHZ19.h"
 
 
 /*
@@ -30,18 +26,12 @@ ACTIVATE IT BY SETTING DEBUG TO 1
 //Functions
 void readAllSensors(void);
 void stepmotor_setup(void);
-void SI1145_setup(void);
 void BME280_setup(void);
 void TSL2591_setup(void);
-void TCS34725_setup(void);
-void mhz19_setup(void);
 void valve_pump_setup(void);
 
-void read_SI1145(void);
 void read_TSL2591(void);
-void read_TCS34725(void);
 void read_BME280(void);
-void read_mhz19(void);
 void read_MQ7(void);
 void read_MQ4(void);
 void read_MIX8410(void);
@@ -49,11 +39,8 @@ float readO2Vout(void);
 float readConcentration(void);
 
 void printAllSensors(void);
-void print_SI1145(void);
 void print_BME280(void);
 void print_TSL2591(void);
-void print_TCS34725(void);
-void print_mhz19(void);
 void print_MQ7(void);
 void print_MQ4(void);
 void print_MIX8410(void);
@@ -79,11 +66,7 @@ int relay[4] = {12,14,27,25};
 
 //Pump
 #define pumpPin 4
-#define pumpChannel 1
-int pumpFreq = 425;
-const int pumpResolution = 8;
-int pumpDutyCycle = 256*14/100;
-int pwmpumpState = 0;
+int pumpState = 0;
 
 
 //StepMotor
@@ -155,15 +138,6 @@ typedef struct{
   int o2_concentration; //O2 sensor o2 concentration
 
   uint16_t r, g, b, c, colorTemp; //Color sensor
-  
-  /*
-  float uv;
-  float visible;
-  float ir;
-  
-  int co2_concentration = 0;
-  int co2_temp = 0;
-  */
 
 }struct_send_message;
 
@@ -219,26 +193,26 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   }
 
   debugln("pump state: ");
-  debugln(pwmpumpState);
+  debugln(pumpState);
   debugln("received pump: ");
   debugln(motorData.received_states[4]);
 
 
   /*If pump is running and stop command was made 
-  stop the pwm pump and set pwmpumpState to 0*/
-  if (pwmpumpState && !motorData.received_states[4])
+  stop the pump and set pumpState to 0*/
+  if (pumpState && !motorData.received_states[4])
   {
-    ledcWrite(pumpChannel, 0);
-    pwmpumpState = 0;
+    digitalWrite(pumpPin ,HIGH);
+    pumpState = 0;
   }
 
 
   /*If pump is not running and run command was made 
-  run the pwm pump and set pwmpumpState to 1*/
-  else if(!pwmpumpState && motorData.received_states[4])
+  run the pump and set pumpState to 1*/
+  else if(!pumpState && motorData.received_states[4])
   {
-    ledcWrite(pumpChannel, pumpDutyCycle);
-    pwmpumpState = 1;
+    digitalWrite(pumpPin ,LOW);
+    pumpState = 1;
   }
 
 
@@ -261,10 +235,6 @@ Adafruit_BME280 bme;
 //Light Sensor TSL2591
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
 
-//Color Sensor TCS34725
-//Adafruit_TCS34725 tcs = Adafruit_TCS34725();
-//TCS34725_INTEGRATIONTIME_614MS, TCS34725_GAIN_1X
-
 
 //CO Sensor MQ7 and CH4 Sensor MQ4
 int adc_resolution = 4095;
@@ -280,16 +250,6 @@ const float VRefer = 3.3; // voltage of adc reference
 float MeasuredVout;
 float Concentration;
 float Concentration_Percentage;
-
-/*
-UV sensor SI1145
-SI114X SI1145 = SI114X(); // initialise sunlight sensor
-Co2 Sensor MH-Z19
-
-#define rx_pin 17 //Serial rx pin no
-#define tx_pin 16 //Serial tx pin no
-MHZ19 *mhz19_uart = new MHZ19(rx_pin,tx_pin);
-*/
 
 
 void setup()
@@ -322,11 +282,8 @@ void setup()
   //running sensor setups
   BME280_setup();
   TSL2591_setup();
-  //TCS34725_setup();
   stepmotor_setup();
   valve_pump_setup();
-  //SI1145_setup();
-  //mhz19_setup();
   delay(3000);
 
 
@@ -386,16 +343,12 @@ void readAllSensors(void) // function to read sensor values and print with Seria
 
   read_TSL2591(); // light sensor
 
-  //read_TCS34725(); // Color sensor
-
   read_MQ7(); // MQ7 CO Sensor
 
   read_MQ4(); // MQ4 METHANE Sensor
 
   read_MIX8410(); // MIX8410 O2 Sensor
 
-  //read_SI1145(); // UV Sensor
-  //read_mhz19(); //Co2 Sensor
 }
 
 //Adjusts the valve and pump pins and pump pwm signal
@@ -405,17 +358,15 @@ void valve_pump_setup(void){
   pinMode(relay[1],OUTPUT);
   pinMode(relay[2],OUTPUT);
   pinMode(relay[3],OUTPUT);
-
+  pinMode(pumpPin, OUTPUT);
 
   //Setting relay pins HIGH at start
   digitalWrite(relay[0] ,HIGH); 
   digitalWrite(relay[1] ,HIGH);
   digitalWrite(relay[2] ,HIGH);
   digitalWrite(relay[3] ,HIGH);
+  digitalWrite(pumpPin ,HIGH);
 
-
-  ledcSetup(pumpChannel, pumpFreq, pumpResolution);  //PWM Pump setting LEDC PWM Signal
-  ledcAttachPin(pumpPin, pumpChannel);
 }
 
 
@@ -475,39 +426,6 @@ void TSL2591_setup(void)
   tsl2591Gain_t gain = tsl.getGain();
 }
 
-void TCS34725_setup(void)
-{
-/*
-  if (tcs.begin()) {
-    Serial.println("Found sensor");
-  } else {
-    Serial.println("No TCS34725 found ... check your connections");
-    //while (1);
-  }
-*/
-}
-
-void SI1145_setup(void)
-{
-  /*
-  while (!SI1145.Begin()) //?????????????
-  {
-    debugln("Si1145 is not ready!");
-    delay(1000);
-  }
-  */
-}
-
-void mhz19_setup(void)
-{
-  /*
-  mhz19_uart->begin(rx_pin, tx_pin);
-  mhz19_uart->setAutoCalibration(true); //AUTO CALIBRATION// IN ORDER TO AUTOCALIBRATE SET setAutoCalibration(true) and calibrateSpan(5000)
-  mhz19_uart->calibrateZero(); //TO CALIBRATE REMOVE COMMENT LINE
-  mhz19_uart->calibrateSpan(5000);
-  */
-}
-
 
 
 ///////////////////////////Sensor Readings//////////////////////////////////////
@@ -536,16 +454,6 @@ void read_TSL2591(void)
 }
 
 
-void read_TCS34725(void){
-/*
-  tcs.getRawData(&myData.r, &myData.g, &myData.b, &myData.c);
-  // colorTemp = tcs.calculateColorTemperature(r, g, b);
-  myData.colorTemp = tcs.calculateColorTemperature_dn40(myData.r, myData.g, myData.b, myData.c);
-  //lux = tcs.calculateLux(r, g, b);
-*/
-}
-
-
 void read_MQ7(void) //CO Sensor
 {
   CO_Aout = analogRead(MQ7_input);  /*Analog value read function*/
@@ -563,25 +471,6 @@ void read_MQ4(void)
 void read_MIX8410(void)
 {
   myData.o2_concentration = readConcentration();
-}
-
-
-void read_SI1145(void)
-{
-  /*
-  myData.visible = SI1145.ReadVisible(); // visible radiation
-  myData.ir = SI1145.ReadIR(); // IR radiation
-  myData.uv = SI1145.ReadUV(); // UV index
-  */
-}
-
-void read_mhz19(void)
-{
-  /*
-  measurement_t m = mhz19_uart->getMeasurement();
-  myData.co2_concentration = m.co2_ppm;
-  myData.co2_temp = m.temperature;
-  */
 }
 
 
@@ -619,12 +508,9 @@ void printAllSensors(void)
 {
   print_BME280();
   print_TSL2591();
-  //print_TCS34725();
   print_MQ7();
   print_MQ4();
   print_MIX8410();
-  //print_SI1145();
-  //print_mhz19();
 }
 
 
@@ -662,17 +548,6 @@ void print_TSL2591(void)
   Serial.print(F("  \n"));
   Serial.print(F("Lux: ")); 
   Serial.println(myData.lux, 6);
-}
-
-void print_TCS34725(void){
-/*
-  Serial.print("Color Temp: "); Serial.print(myData.colorTemp, DEC); Serial.print(" K - ");
-  Serial.print("R: "); Serial.print(myData.r, DEC); Serial.print(" ");
-  Serial.print("G: "); Serial.print(myData.g, DEC); Serial.print(" ");
-  Serial.print("B: "); Serial.print(myData.b, DEC); Serial.print(" ");
-  Serial.print("C: "); Serial.print(myData.c, DEC); Serial.print(" ");
-  Serial.println(" ");
-*/
 }
 
 
@@ -720,27 +595,4 @@ void print_MIX8410(void)
   //Serial.print(Vout);
   Serial.print("O2 Concentration: ");
   Serial.println(myData.o2_concentration);
-}
-
-void print_SI1145(void)
-{
-  /*
-  Serial.print("\n======== UV SENSOR ========\n");
-  Serial.print("visible radiation: ");
-  Serial.println(myData.visible);
-  Serial.print("IR radiation: ");
-  Serial.println(myData.ir);
-  Serial.print("UV index: ");
-  Serial.println(myData.uv);
-  */
-}
-void print_mhz19(void)
-{
-  /*
-  Serial.print("\n======== MH-Z19 ========\n");
-  Serial.print("co2: ");
-  Serial.println(myData.co2_concentration);
-  Serial.print("temp: ");
-  Serial.println(myData.co2_temp);
-  */
 }

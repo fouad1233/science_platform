@@ -9,8 +9,7 @@ int input;
 
 void setup() {
   Serial.begin(115200);
-  ledcSetup(pumpChannel, freq, resolution);
-  ledcAttachPin(pumpPin, pumpChannel);
+  pinMode(25, OUTPUT);
 }
 
 void loop() {
@@ -36,4 +35,11 @@ void loop() {
     //   Serial.print(pumpDutyCycle);
     //   Serial.println();
     // }
+  digitalWrite(pumpPin, HIGH);
+  Serial.println("acık");
+  delay(3000);
+  digitalWrite(pumpPin, LOW);
+  Serial.println("kapalı");
+  delay(3000);
+  
 }
