@@ -9,34 +9,53 @@ This file is used to get sensor values from esp now and transmit it with serial
 
 #include <ArduinoJson.h>
 
-
+// TIMER SETUP
 uint8_t read_sensor_flag; //TIMER FLAG
+hw_timer_t *My_timer = NULL;
+
+void IRAM_ATTR onTimer()
+{
+  read_sensor_flag = 1;
+}
+
+
 // MAC Address of responder - edit as required
 uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x2D, 0xCC}; //40:91:51:AC:2D:CC
 
+
 // Define a data structure
 typedef struct{
-  float uv;
-  float visible;
-  float ir;
+  
   float temp_BME;
   float pressure;
   float altitude;
   float humidity;
+
   uint32_t lum;
   uint16_t ir_TSL, full, visible_TSL, lux;
-  float CO_gas_val ;
-  int co2_concentration;
-  int co2_temp;
+
+  float CO_gas_val;
+
   float met_gas_val;
   int o2_concentration;
+
+  uint16_t r, g, b, c, colorTemp; //Color sensor
+
+  /*
+  float uv;
+  float visible;
+  float ir;
+
+  int co2_concentration;
+  int co2_temp;
+  */
+  
 } struct_receive_message;
 
 typedef struct{
   int motorFlag = 0;
   int tube_to_go = 1;
-  int received_states[5] = {1,1,1,1,0};  // 0,1,2,3 indexler->RELAY 1,2,3,4(pump) 4.index pump(pwm) 
-  //msg dosyasına değişkenleri ekle
+  int received_states[5] = {1,1,1,1,0};  // 0,1,2,3 indexler->1,2,3,4 RELAY  5 pump(pwm) 
   
 }struct_motor_message;
 
@@ -92,15 +111,10 @@ void UART_RX_IRQ() {
   //Serial.printf("\nSerial data processed!\n");
 }
 
-void json_data_set(void); // JSON FUNCTION
+void json_data_set_esp_now(void); // JSON FUNCTION
 StaticJsonDocument<300> doc;
 
-// TIMER SETUP
-hw_timer_t *My_timer = NULL;
-void IRAM_ATTR onTimer()
-{
-  read_sensor_flag = 1;
-}
+
 
 
 void setup()
@@ -171,21 +185,31 @@ void json_data_set_esp_now(void){
   doc["pressure"] = myData.pressure; // float
   doc["altitude"] = myData.altitude; // float
 
-  doc["uv_SI"] = myData.uv; //float
-  doc["visible_SI"] = myData.visible; //float
-  doc["ir_SI"] = myData.ir; //float
 
   doc["ir_TSL"] = myData.ir_TSL; // uint16_t 
   //doc["full"] = full; // uint16_t
   doc["visible_TSL"] = myData.visible_TSL; // uint16_t
   doc["lux"] = myData.lux; // uint16_t
 
-  doc["co2_concentration"] = myData.co2_concentration; // int
 
-  doc["CO_gas_val"] = myData.CO_gas_val ; //float
+  doc["CO_gas_val"] = myData.CO_gas_val; //float
 
-  doc["met_gas_val"] = myData.met_gas_val ;  //float
+  doc["met_gas_val"] = myData.met_gas_val;  //float
 
   doc["o2_concentration"] = myData.o2_concentration; //int
-  
+
+  doc["red"] = myData.r;
+  doc["green"] = myData.g;
+  doc["blue"] = myData.b;
+  doc["c"] = myData.c;
+  doc["color_temp"] = myData.colorTemp;
+
+
+
+  /*
+  doc["uv_SI"] = myData.uv; //float 
+  doc["visible_SI"] = myData.visible; //float 
+  doc["ir_SI"] = myData.ir; //float 
+  doc["co2_concentration"] = 0; // int  
+*/
 }
