@@ -41,8 +41,9 @@ typedef struct{
   float humidity;
 
   uint32_t lum;
-  uint16_t ir_TSL, full, visible_TSL, lux;
-
+  uint16_t ir_TSL, full, visible_TSL;
+  float lux;
+  
   float CO_gas_val;
 
   float met_gas_val;
@@ -67,7 +68,7 @@ typedef struct{
 typedef struct{
   int motorFlag = 0;
   int tube_to_go = 1;
-  int received_states[5] = {1,1,1,1,0};  // 0,1,2,3 indexler->1,2,3,4 RELAY  5 pump(pwm) 
+  int received_states[5] = {1,1,1,1,1};  // 0,1,2,3 indexler->1,2,3,4 RELAY  5 pump(pwm) 
   
 }struct_motor_message;
 
@@ -126,6 +127,9 @@ void UART_RX_IRQ() {
 }
 
 void json_data_set_esp_now(void); // JSON FUNCTION
+void TCS34725_setup(void);
+void read_TCS34725(void);
+void print_TCS34725(void);
 StaticJsonDocument<300> doc;
 
 
@@ -234,7 +238,7 @@ void json_data_set_esp_now(void){
   doc["ir_TSL"] = myData.ir_TSL; // uint16_t 
   //doc["full"] = full; // uint16_t
   doc["visible_TSL"] = myData.visible_TSL; // uint16_t
-  doc["lux"] = myData.lux; // uint16_t
+  doc["lux"] = myData.lux; // float
 
 
   doc["CO_gas_val"] = myData.CO_gas_val; //float

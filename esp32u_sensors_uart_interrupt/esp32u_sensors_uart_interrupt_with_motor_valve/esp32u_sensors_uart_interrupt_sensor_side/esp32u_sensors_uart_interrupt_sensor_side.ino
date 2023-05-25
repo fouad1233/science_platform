@@ -131,8 +131,9 @@ typedef struct{
   float humidity;
   
   uint32_t lum;
-  uint16_t ir_TSL, full, visible_TSL, lux;
-  
+  uint16_t ir_TSL, full, visible_TSL;
+  float lux;
+
   float CO_gas_val;
   float met_gas_val;
   int o2_concentration; //O2 sensor o2 concentration
@@ -145,7 +146,7 @@ typedef struct{
 typedef struct{
   int motorFlag = 0;
   int tube_to_go = 1;
-  int received_states[5] = {1,1,1,1,0};  // 0,1,2,3 indexler->1,2,3,4 RELAY  5 pump(pwm)
+  int received_states[5] = {1,1,1,1,1};  // 0,1,2,3 indexler->1,2,3,4 RELAY  5 pump(pwm)
 
 }struct_motor_message;
 
