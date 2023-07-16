@@ -29,10 +29,13 @@ uint8_t broadcastAddress[] = {0x40, 0x91, 0x51, 0xAC, 0x2D, 0xCC}; //40:91:51:AC
 
 // Define a data structure
 typedef struct{
-  
   float temp_BME;
+  float pressure;
+  float altitude;
   float humidity;
+
   float met_gas_val;
+  
   float weight_average; //hx711 new
 } struct_receive_message;
 
@@ -148,7 +151,9 @@ void loop()
 void json_data_set_esp_now(void){
   doc["temp"] = myData.temp_BME;                 // float
   doc["humidity"] = myData.humidity;             // float
+  doc["pressure"] = myData.pressure;             // float
+  doc["altitude"] = myData.altitude;             // float
+
   doc["met_gas_val"] = myData.met_gas_val;       // float
   doc["weight_average"] = myData.weight_average; // float
-
 }

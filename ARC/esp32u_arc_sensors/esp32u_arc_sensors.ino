@@ -53,8 +53,12 @@ uint16_t adc_resolution = 4095;
 // Define a data structure
 typedef struct {
   float temp_BME;
+  float pressure;
+  float altitude;
   float humidity;
+
   float met_gas_val;
+
   float weight_average; //hx711 new
 } struct_send_message;
 
@@ -237,7 +241,7 @@ void HX711_setup()
   Serial.println(scale.get_units(5), 1);  // print the average of 5 readings from the ADC minus tare weight (not set) divided
             // by the SCALE parameter (not set yet)
             
-  scale.set_scale(490.9288);
+  scale.set_scale(451.4174);
   //scale.set_scale(-471.497);                      // this value is obtained by calibrating the scale with known weights; see the README for details
   scale.tare();               // reset the scale to 0
 
@@ -263,16 +267,19 @@ void read_BME280()
 {
   myData.temp_BME = bme.readTemperature();
   myData.humidity = bme.readHumidity();
-}
+  myData.pressure = bme.readPressure() / 100.0F;
+  myData.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  }
 
 void read_HX711()
 {
   one_read_weight = scale.get_units();
   myData.weight_average = scale.get_units(10);
-
+/*
   scale.power_down();             // put the ADC in sleep mode
   delay(5000);
   scale.power_up();
+*/
 
 }
 
@@ -287,6 +294,11 @@ void printAllSensors()
   print_BME280();
   print_MQ4();
   print_HX711();
+  Serial.println("\n");
+  Serial.print("MotorState = ");
+  Serial.println(motorData.motorState);
+  Serial.print("MotorFlag = ");
+  Serial.print(motorFlag);
 }
 
 
@@ -296,6 +308,14 @@ void print_BME280()
   Serial.print("Temperature = ");
   Serial.print(myData.temp_BME);
   Serial.println(" Celcius");
+
+  Serial.print("Pressure = ");
+  Serial.print(myData.pressure);
+  Serial.println(" hPa");
+
+  Serial.print("Approx. Altitude = ");
+  Serial.print(myData.altitude);
+  Serial.println(" m");
 
   Serial.print("Humidity = ");
   Serial.print(myData.humidity);
@@ -330,7 +350,14 @@ void print_HX711()
 void motor_rotate()
 {
   if (motor_direction)
+  {
     myStepper.step(stepsPerRevolution);
+  }
   else
+  {
     myStepper.step(-stepsPerRevolution);
+  }
+  motor_direction = !motor_direction;
+
+  
 }
