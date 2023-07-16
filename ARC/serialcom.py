@@ -17,9 +17,11 @@ def sensor():
 			msg = Rover_sensor()
 			msg.temperature = j['temp']
 			msg.humidity = j['humidity']
-			#msg.pressure = j['pressure'] 
-			#msg.altitude = j['altitude'] 
+			msg.pressure = j['pressure'] 
+			msg.altitude = j['altitude'] 
+   
 			msg.met_gas_val = j['met_gas_val'] 
+   
 			msg.weight_average = j["weight_average"]
 
 			msg.header.stamp = rospy.Time.now()
